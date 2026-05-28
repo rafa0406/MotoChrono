@@ -298,6 +298,10 @@
                 tousLesPoints = tousLesPoints.concat(points);
             }
 
+            // --- LIGNE MAGIQUE À AJOUTER ---
+            // On rajoute le point de départ tout à la fin pour forcer la clôture du dernier tour !
+            tousLesPoints.push(points[0]);
+            
             let csvContent = "Time_ms,Lat,Lng,Speed_kmh,Satellites,Roll_deg,Pitch_deg,G_Total,G_Long,Fuel_L\n";
             let currentTimeMs = 0.0;
             let isTurningRight = true;
