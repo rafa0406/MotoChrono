@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MotoChrono - Analyse Télémétrie CBR 929 RR</title>
+    
+    <!-- Tailwind CSS pour un design moderne et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS pour la carte interactive -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js pour les graphiques de données -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons pour des icônes épurées -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Styles personnalisés pour la carte Leaflet en thème sombre */
+        .leaflet-container { background: #0f172a; }
+        /* Scrollbar épurée pour la liste des tours */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen pb-10">
+
+    <div class="container mx-auto px-3 md:px-6 py-4 md:py-6">
+        <!-- En-tête Responsive -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 border-b border-slate-800 pb-4 md:pb-5 gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-red-600 p-2 md:p-2.5 rounded-lg text-white shadow-lg shadow-red-600/30 shrink-0">
+                    <i data-lucide="gauge" class="w-6 h-6 md:w-8 md:h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight leading-tight">MotoChrono</h1>
+                    <p class="text-xs md:text-sm text-slate-400">Télémétrie CBR 929 RR</p>
+                </div>
+            </div>
+            <div class="w-full md:w-auto flex items-center justify-end">
+                <span id="file-status" class="text-[10px] md:text-xs bg-slate-800 text-slate-400 px-3 py-1.5 rounded-full border border-slate-700 truncate max-w-[200px] md:max-w-xs">
+                    Aucun fichier chargé
+                </span>
+            </div>
+        </header>
+
+        <!-- Zone de dépôt du fichier (Dropzone) -->
+        <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-red-500 bg-slate-900/50 rounded-xl p-6 md:p-8 text-center cursor-pointer transition-all mb-6 md:mb-8 shadow-inner group">
+            <input type="file" id="file-input" accept=".csv" class="hidden" />
+            <div class="flex flex-col items-center justify-center gap-2 md:gap-3">
+                <div class="bg-slate-800 p-3 md:p-4 rounded-full text-slate-400 border border-slate-700 group-hover:text-red-500 transition-colors">
+                    <i data-lucide="upload-cloud" class="w-6 h-6 md:w-8 md:h-8"></i>
+                </div>
+                <p class="text-sm md:text-lg font-medium text-slate-200">Glissez ou touchez pour charger un <span class="text-red-500">.CSV</span></p>
+                <p class="hidden md:block text-xs text-slate-500">Fichier généré sur la carte MicroSD ou via le simulateur</p>
+            </div>
+        </div>
+
+        <!-- Tableau de bord (Caché au départ) -->
+        <div id="dashboard" class="hidden space-y-6 md:space-y-8 animate-fade-in">
+            
+            <!-- Section 1 : Métriques Générales (Grille Responsive) -->
+            <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                <!-- Vitesse Max -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                    <div class="p-2 md:p-3 rounded-lg bg-emerald-500/10 text-emerald-500 shrink-0">
+                        <i data-lucide="zap" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate">Vitesse Max</p>
+                        <p class="text-lg md:text-2xl font-black text-slate-100 truncate" id="stat-max-speed">0 <span class="text-[10px] md:text-xs font-normal text-slate-400">km/h</span></p>
+                    </div>
+                </div>
+
+                <!-- Angle Max -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                    <div class="p-2 md:p-3 rounded-lg bg-orange-500/10 text-orange-500 shrink-0">
+                        <i data-lucide="navigation" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate">Angle Max</p>
+                        <p class="text-lg md:text-2xl font-black text-slate-100 truncate" id="stat-max-roll">0<span class="text-[10px] md:text-xs font-normal text-slate-400">°</span></p>
+                    </div>
+                </div>
+
+                <!-- Freinage G-Force -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                    <div class="p-2 md:p-3 rounded-lg bg-red-500/10 text-red-500 shrink-0">
+                        <i data-lucide="arrow-down-to-dot" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate">Freinage</p>
+                        <p class="text-lg md:text-2xl font-black text-slate-100 truncate" id="stat-max-g">0.0 <span class="text-[10px] md:text-xs font-normal text-slate-400">G</span></p>
+                    </div>
+                </div>
+
+                <!-- Essence consommée -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                    <div class="p-2 md:p-3 rounded-lg bg-cyan-500/10 text-cyan-500 shrink-0">
+                        <i data-lucide="droplet" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate">Conso.</p>
+                        <p class="text-lg md:text-2xl font-black text-slate-100 truncate" id="stat-fuel">0.0 <span class="text-[10px] md:text-xs font-normal text-slate-400">L</span></p>
+                    </div>
+                </div>
+
+                <!-- Temps de Session -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4 col-span-2 sm:col-span-1 lg:col-span-1">
+                    <div class="p-2 md:p-3 rounded-lg bg-purple-500/10 text-purple-500 shrink-0">
+                        <i data-lucide="clock" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate">Session</p>
+                        <p class="text-lg md:text-2xl font-black text-slate-100 truncate" id="stat-duration">00:00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 : Carte & Tours de circuit -->
+            <section class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Colonne Laps (Haut sur mobile, Gauche sur PC) -->
+                <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex flex-col h-48 lg:h-[500px]">
+                    <div class="flex justify-between items-center mb-2 md:mb-4 shrink-0">
+                        <h2 class="text-sm md:text-base font-bold flex items-center gap-2 text-red-500">
+                            <i data-lucide="trophy" class="w-4 h-4 md:w-5 md:h-5"></i>
+                            Tours de Circuit
+                        </h2>
+                        <span id="lap-count" class="text-[10px] md:text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700 text-slate-300">0 Tour</span>
+                    </div>
+
+                    <p class="hidden lg:block text-[10px] text-slate-400 mb-3 bg-slate-950 p-2 rounded border border-slate-800 shrink-0">
+                        💡 <strong class="text-red-400">Cliquez sur la carte</strong> pour déplacer la ligne de départ/arrivée.
+                    </p>
+                    
+                    <!-- Liste défilante -->
+                    <div class="overflow-y-auto flex-grow space-y-2 pr-1" id="laps-list">
+                        <div class="text-center py-4 md:py-8 text-slate-500 text-xs md:text-sm">
+                            En attente de données...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colonne Carte (Bas sur mobile, Droite sur PC) -->
+                <div class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 flex flex-col h-[400px] lg:h-[500px]">
+                    <!-- Sélecteurs d'affichage -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2 shrink-0">
+                        <div class="flex items-center gap-2 md:gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                            <h3 class="font-bold text-xs md:text-sm flex items-center gap-1.5 md:gap-2">
+                                <i data-lucide="map" class="w-4 h-4 text-slate-400"></i>
+                                <span class="hidden sm:inline">Tracé GPS</span>
+                            </h3>
+                            <!-- Coordonnées (Cachées sur très petits écrans) -->
+                            <div class="hidden md:flex items-center gap-1 text-[10px] text-slate-400 font-mono bg-slate-950 px-2 py-1 rounded border border-slate-800">
+                                <i data-lucide="crosshair" class="w-3 h-3 text-red-500"></i>
+                                <span id="mouse-coords">Lat: -, Lng: -</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Filtres -->
+                        <div class="flex flex-wrap items-center gap-2 text-[10px] md:text-xs w-full sm:w-auto">
+                            <select id="map-style-selector" class="bg-slate-800 text-slate-200 border border-slate-700 rounded-md md:rounded-lg px-2 py-1 md:py-1.5 outline-none focus:border-red-500 cursor-pointer flex-1 sm:flex-none">
+                                <option value="dark">Sombre</option>
+                                <option value="light">Clair</option>
+                                <option value="satellite">Satellite</option>
+                            </select>
+                            
+                            <div class="flex flex-1 sm:flex-none gap-1">
+                                <button id="btn-color-speed" class="flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-red-600 text-white shadow-md shadow-red-600/10 truncate">
+                                    Vitesse
+                                </button>
+                                <button id="btn-color-roll" class="flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 truncate">
+                                    Angle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conteneur Leaflet -->
+                    <div id="map" class="w-full flex-grow rounded-lg overflow-hidden border border-slate-800 shadow-inner z-0"></div>
+                </div>
+            </section>
+
+            <!-- Section 3 : Graphique d'Analyse Linéaire -->
+            <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-1">
+                    <h2 class="text-sm md:text-base font-bold flex items-center gap-2">
+                        <i data-lucide="line-chart" class="w-4 h-4 md:w-5 md:h-5 text-red-500"></i>
+                        Graphique Télémétrique
+                    </h2>
+                    <span class="text-[9px] md:text-xs text-slate-400">Touchez ou survolez pour voir sur la carte</span>
+                </div>
+                <div class="relative h-48 md:h-80 w-full">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // --- Variables Globales ---
+        let rawTelemetryData = [];
+        let map = null;
+        let mapSegments = [];
+        let telemetryChart = null;
+        let startFinishGate = null;
+        let gateMarker = null;
+        let currentPositionMarker = null;
+        let activeColorMode = 'speed'; 
+        
+        let currentTileLayer = null;
+        const mapTiles = {
+            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }),
+            light: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 })
+        };
+
+        // --- Initialisation ---
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            initMap();
+            setupEventListeners();
+        });
+
+        function initMap() {
+            map = L.map('map', { preferCanvas: true }).setView([46.2276, 2.2137], 6);
+            
+            currentTileLayer = mapTiles.dark;
+            currentTileLayer.addTo(map);
+
+            map.on('click', (e) => {
+                if (rawTelemetryData.length === 0) return;
+                setStartFinishGate(e.latlng.lat, e.latlng.lng);
+                recalculateLaps();
+            });
+
+            const mouseCoordsEl = document.getElementById('mouse-coords');
+            if(mouseCoordsEl) {
+                map.on('mousemove', (e) => {
+                    mouseCoordsEl.innerText = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+                });
+                map.on('mouseout', () => {
+                    mouseCoordsEl.innerText = 'Lat: -, Lng: -';
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file-input');
+            const btnColorSpeed = document.getElementById('btn-color-speed');
+            const btnColorRoll = document.getElementById('btn-color-roll');
+            const mapStyleSelector = document.getElementById('map-style-selector');
+
+            // Responsive Map Resize
+            window.addEventListener('resize', () => {
+                if(map) map.invalidateSize();
+            });
+
+            mapStyleSelector.addEventListener('change', (e) => {
+                const style = e.target.value;
+                map.removeLayer(currentTileLayer);
+                currentTileLayer = mapTiles[style];
+                currentTileLayer.addTo(map);
+            });
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-red-500', 'bg-slate-800/60');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-red-500', 'bg-slate-800/60');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-red-500', 'bg-slate-800/60');
+                const file = e.dataTransfer.files[0];
+                if (file && file.name.endsWith('.csv')) processFile(file);
+            });
+            dropzone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) processFile(file);
+            });
+
+            btnColorSpeed.addEventListener('click', () => {
+                activeColorMode = 'speed';
+                btnColorSpeed.className = "flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-red-600 text-white shadow-md shadow-red-600/10 truncate";
+                btnColorRoll.className = "flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 truncate";
+                redrawMap();
+            });
+
+            btnColorRoll.addEventListener('click', () => {
+                activeColorMode = 'roll';
+                btnColorRoll.className = "flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-red-600 text-white shadow-md shadow-red-600/10 truncate";
+                btnColorSpeed.className = "flex-1 sm:flex-none px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 truncate";
+                redrawMap();
+            });
+        }
+
+        function processFile(file) {
+            document.getElementById('file-status').innerText = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseCSV(e.target.result);
+                if (rawTelemetryData.length > 0) {
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    document.getElementById('dropzone').classList.add('py-3', 'md:py-4');
+                    
+                    setTimeout(() => {
+                        map.invalidateSize();
+                        const firstValidPoint = rawTelemetryData.find(p => p.lat !== 0 && p.lng !== 0);
+                        if (firstValidPoint) setStartFinishGate(firstValidPoint.lat, firstValidPoint.lng);
+                        updateStatistics();
+                        recalculateLaps();
+                        redrawMap();
+                        renderChart();
+                    }, 100);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(text) {
+            rawTelemetryData = [];
+            const lines = text.split('\n');
+            if (lines.length < 2) return;
+
+            const headers = lines[0].trim().split(',');
+            const idxTime = headers.indexOf('Time_ms');
+            const idxLat = headers.indexOf('Lat');
+            const idxLng = headers.indexOf('Lng');
+            const idxSpeed = headers.indexOf('Speed_kmh');
+            const idxRoll = headers.indexOf('Roll_deg');
+            const idxPitch = headers.indexOf('Pitch_deg');
+            const idxGLong = headers.indexOf('G_Long');
+            const idxFuel = headers.indexOf('Fuel_L');
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const values = line.split(',');
+                if (values.length < headers.length) continue;
+
+                const pt = {
+                    time: parseInt(values[idxTime]),
+                    lat: parseFloat(values[idxLat]),
+                    lng: parseFloat(values[idxLng]),
+                    speed: parseFloat(values[idxSpeed]),
+                    roll: parseFloat(values[idxRoll]),
+                    pitch: parseFloat(values[idxPitch]),
+                    gLong: parseFloat(values[idxGLong]),
+                    fuel: parseFloat(values[idxFuel])
+                };
+
+                if (!isNaN(pt.lat) && !isNaN(pt.lng) && pt.lat !== 0 && pt.lng !== 0) {
+                    rawTelemetryData.push(pt);
+                }
+            }
+        }
+
+        function updateStatistics() {
+            if (rawTelemetryData.length === 0) return;
+
+            let maxSpeed = 0, maxRoll = 0, maxGLong = 0;
+            
+            rawTelemetryData.forEach(pt => {
+                if (pt.speed > maxSpeed) maxSpeed = pt.speed;
+                if (Math.abs(pt.roll) > maxRoll) maxRoll = Math.abs(pt.roll);
+                if (pt.gLong < maxGLong) maxGLong = pt.gLong; // Freinage (négatif)
+            });
+
+            document.getElementById('stat-max-speed').innerHTML = `${maxSpeed.toFixed(0)} <span class="text-[10px] md:text-xs font-normal text-slate-400">km/h</span>`;
+            document.getElementById('stat-max-roll').innerHTML = `${maxRoll.toFixed(0)}<span class="text-[10px] md:text-xs font-normal text-slate-400">°</span>`;
+            document.getElementById('stat-max-g').innerHTML = `${Math.abs(maxGLong).toFixed(2)} <span class="text-[10px] md:text-xs font-normal text-slate-400">G</span>`;
+            
+            const initialFuel = rawTelemetryData[0].fuel;
+            const lastFuel = rawTelemetryData[rawTelemetryData.length - 1].fuel;
+            const consumedFuel = Math.max(0, initialFuel - lastFuel);
+            document.getElementById('stat-fuel').innerHTML = `${consumedFuel.toFixed(2)} <span class="text-[10px] md:text-xs font-normal text-slate-400">L</span>`;
+
+            const totalSec = Math.floor((rawTelemetryData[rawTelemetryData.length - 1].time - rawTelemetryData[0].time) / 1000);
+            document.getElementById('stat-duration').innerText = `${Math.floor(totalSec / 60).toString().padStart(2, '0')}:${(totalSec % 60).toString().padStart(2, '0')}`;
+        }
+
+        function setStartFinishGate(lat, lng) {
+            startFinishGate = { lat, lng };
+            if (gateMarker) map.removeLayer(gateMarker);
+
+            const customIcon = L.divIcon({
+                html: `<div class="w-6 h-6 md:w-8 md:h-8 bg-slate-900 border-2 border-red-500 rounded-full p-1 shadow-lg shadow-red-500/20"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500 w-full h-full"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></div>`,
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24]
+            });
+            gateMarker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+        }
+
+        function recalculateLaps() {
+            if (!startFinishGate || rawTelemetryData.length === 0) return;
+
+            const laps = [];
+            let currentLapPoints = [];
+            let lastCrossingTime = 0;
+            const MIN_LAP_TIME_MS = 25000;
+            const DETECTION_RADIUS_METER = 20;
+
+            rawTelemetryData.forEach((pt) => {
+                const dist = getDistance(pt.lat, pt.lng, startFinishGate.lat, startFinishGate.lng);
+                currentLapPoints.push(pt);
+
+                if (dist < DETECTION_RADIUS_METER) {
+                    const now = pt.time;
+                    if (now - lastCrossingTime > MIN_LAP_TIME_MS) {
+                        if (lastCrossingTime !== 0) {
+                            laps.push({
+                                num: laps.length + 1,
+                                durationMs: now - lastCrossingTime,
+                                points: [...currentLapPoints],
+                                maxSpeed: Math.max(...currentLapPoints.map(p => p.speed)),
+                                maxRoll: Math.max(...currentLapPoints.map(p => Math.abs(p.roll)))
+                            });
+                            currentLapPoints = [];
+                        }
+                        lastCrossingTime = now;
+                    }
+                }
+            });
+
+            const lapsList = document.getElementById('laps-list');
+            document.getElementById('lap-count').innerText = `${laps.length} Tour${laps.length > 1 ? 's' : ''}`;
+            lapsList.innerHTML = '';
+
+            if (laps.length === 0) {
+                lapsList.innerHTML = `<div class="text-center py-4 text-slate-500 text-xs">Aucun tour complet détecté.</div>`;
+                return;
+            }
+
+            const bestLapTime = Math.min(...laps.map(l => l.durationMs));
+
+            laps.forEach(lap => {
+                const isBest = lap.durationMs === bestLapTime;
+                const lapElement = document.createElement('div');
+                lapElement.className = `p-2 md:p-3 rounded-lg border cursor-pointer transition-all ${isBest ? 'bg-red-500/10 border-red-500/40 hover:bg-red-500/20' : 'bg-slate-950 border-slate-800 hover:border-slate-700 hover:bg-slate-900'}`;
+                
+                lapElement.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs md:text-sm font-bold flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${isBest ? 'bg-red-500' : 'bg-slate-400'}"></span>
+                            Tour ${lap.num}
+                        </span>
+                        <span class="text-xs md:text-sm font-mono font-bold ${isBest ? 'text-red-400' : 'text-slate-300'}">${msToTime(lap.durationMs)}</span>
+                    </div>
+                    <div class="flex justify-between text-[9px] md:text-[10px] text-slate-400 mt-1 md:mt-2">
+                        <span>Vmax: <b>${lap.maxSpeed.toFixed(0)}</b></span>
+                        <span>Angle: <b>${lap.maxRoll.toFixed(0)}°</b></span>
+                    </div>
+                `;
+                lapElement.addEventListener('click', () => zoomOnLap(lap));
+                lapsList.appendChild(lapElement);
+            });
+        }
+
+        function zoomOnLap(lap) {
+            map.fitBounds(L.latLngBounds(lap.points.map(p => [p.lat, p.lng])), { padding: [20, 20] });
+            renderChart(lap.points);
+        }
+
+        function redrawMap() {
+            if (rawTelemetryData.length === 0) return;
+            map.invalidateSize();
+            mapSegments.forEach(seg => map.removeLayer(seg));
+            mapSegments = [];
+
+            const points = rawTelemetryData;
+            const maxSpeed = Math.max(...points.map(p => p.speed));
+            const maxRoll = Math.max(...points.map(p => Math.abs(p.roll)));
+
+            for (let i = 0; i < points.length - 1; i++) {
+                const ptA = points[i], ptB = points[i + 1];
+                let color = activeColorMode === 'speed' ? getSpeedColor(ptA.speed / (maxSpeed||1)) : getRollColor(Math.abs(ptA.roll) / (maxRoll||1));
+
+                const segment = L.polyline([[ptA.lat, ptA.lng], [ptB.lat, ptB.lng]], {
+                    color: color, weight: 3, opacity: 0.9
+                }).addTo(map);
+
+                // Pour les mobiles, on utilise bindPopup plutôt que bindTooltip pour un meilleur contrôle tactile
+                if (window.matchMedia("(max-width: 768px)").matches) {
+                    segment.bindPopup(`<b>V:</b> ${ptA.speed.toFixed(0)}km/h | <b>A:</b> ${Math.abs(ptA.roll).toFixed(0)}°`);
+                } else {
+                    segment.bindTooltip(`<b>V:</b> ${ptA.speed.toFixed(0)} km/h<br><b>Angle:</b> ${Math.abs(ptA.roll).toFixed(0)}°`);
+                }
+                mapSegments.push(segment);
+            }
+            map.fitBounds(L.latLngBounds(points.map(p => [p.lat, p.lng])), { padding: [20, 20] });
+        }
+
+        function renderChart(dataToUse = rawTelemetryData) {
+            const ctx = document.getElementById('telemetryChart').getContext('2d');
+            const step = Math.max(1, Math.floor(dataToUse.length / 150)); // Optimisation mobile
+            const chartData = dataToUse.filter((_, i) => i % step === 0);
+
+            if (telemetryChart) telemetryChart.destroy();
+
+            telemetryChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(pt => `${Math.floor(pt.time/60000)}:${Math.floor((pt.time/1000)%60).toString().padStart(2,'0')}`),
+                    datasets: [
+                        { label: 'Vitesse', data: chartData.map(p => p.speed), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', yAxisID: 'y', tension: 0.2, pointRadius: 0, pointHitRadius: 10 },
+                        { label: 'Angle', data: chartData.map(p => Math.abs(p.roll)), borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', yAxisID: 'y1', tension: 0.2, pointRadius: 0, pointHitRadius: 10 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { boxWidth: 12, font: { size: 10 }, color: '#cbd5e1' } } },
+                    scales: {
+                        x: { display: true, ticks: { maxTicksLimit: 6, color: '#94a3b8', font: { size: 9 } } },
+                        y: { position: 'left', ticks: { color: '#ef4444', font: { size: 9 } }, grid: { color: '#334155' } },
+                        y1: { position: 'right', ticks: { color: '#f97316', font: { size: 9 } }, grid: { display: false } }
+                    },
+                    onHover: (e, els) => {
+                        if (els.length) {
+                            const pt = chartData[els[0].index];
+                            if (pt) updateMapCursor(pt.lat, pt.lng, pt.speed, pt.roll);
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMapCursor(lat, lng, speed, roll) {
+            if (!currentPositionMarker) {
+                const pulseIcon = L.divIcon({
+                    html: `<div class="relative flex h-4 w-4 md:h-5 md:w-5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 md:h-5 md:w-5 bg-red-500 border border-white"></span></div>`,
+                    className: '', iconSize: [20, 20], iconAnchor: [10, 10]
+                });
+                currentPositionMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+            } else {
+                currentPositionMarker.setLatLng([lat, lng]);
+            }
+        }
+
+        // --- Utilitaires ---
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const dphi = (lat2-lat1)*Math.PI/180, dlam = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dphi/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dlam/2)**2;
+            return 6371e3 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+        function getSpeedColor(r) { return r < 0.5 ? `rgb(${Math.floor(255*r*2)},${Math.floor(255*r*2)},255)` : `rgb(255,${Math.floor(255*(1-(r-0.5)*2))},0)`; }
+        function getRollColor(r) { return `rgb(${Math.floor(255*r)},${Math.floor(255*(1-r))},50)`; }
+        function msToTime(d) { return `${Math.floor((d/60000)%60).toString().padStart(2,'0')}:${Math.floor((d/1000)%60).toString().padStart(2,'0')}.${parseInt((d%1000)/10).toString().padStart(2,'0')}`; }
+    </script>
+</body>
+</html>

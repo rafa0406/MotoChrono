@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Studio Télémétrie - MotoChrono</title>
+    
+    <!-- Tailwind CSS pour un design moderne et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        .leaflet-container { background: #0f172a; cursor: crosshair; }
+        /* Scrollbar personnalisée pour le panneau latéral */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-screen w-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- ZONE PRINCIPALE : CARTE & OUTILS DE DESSIN -->
+    <main class="flex-1 flex flex-col relative z-0 h-[50vh] md:h-screen">
+        
+        <!-- Barre d'outils supérieure -->
+        <header class="p-2 md:p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-lg z-10 shrink-0">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="bg-red-600 p-1.5 md:p-2 rounded-lg shadow-lg shadow-red-600/30">
+                    <i data-lucide="map-pin" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm md:text-lg font-bold text-white leading-tight">Éditeur</h1>
+                    <p class="hidden sm:block text-[10px] text-slate-400">Cliquez pour tracer ou importez un CSV.</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-1.5 md:gap-2">
+                <!-- Import CSV -->
+                <input type="file" id="import-csv" accept=".csv" class="hidden" onchange="importCSV(event)">
+                <button onclick="document.getElementById('import-csv').click()" class="flex items-center gap-1.5 px-2 md:px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs md:text-sm font-medium shadow-lg shadow-blue-600/20 transition-colors">
+                    <i data-lucide="upload" class="w-4 h-4"></i> <span class="hidden sm:inline">Importer</span>
+                </button>
+                
+                <div class="w-px h-5 md:h-6 bg-slate-700 mx-0.5 md:mx-1"></div>
+                
+                <button onclick="undoLastPoint()" class="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs md:text-sm font-medium transition-colors text-slate-300">
+                    <i data-lucide="undo" class="w-4 h-4"></i> <span class="hidden sm:inline">Annuler</span>
+                </button>
+                <button onclick="clearMap()" class="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs md:text-sm font-medium transition-colors text-red-400">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">Effacer</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Conteneur de la carte -->
+        <div id="map" class="w-full flex-grow"></div>
+    </main>
+
+    <!-- PANNEAU LATÉRAL : CONFIGURATION DE LA SIMULATION -->
+    <aside class="w-full md:w-80 lg:w-96 bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 flex flex-col shadow-2xl z-20 h-[50vh] md:h-screen shrink-0">
+        <div class="p-4 md:p-5 border-b border-slate-800 shrink-0">
+            <h2 class="text-base md:text-lg font-bold flex items-center gap-2">
+                <i data-lucide="cpu" class="w-5 h-5 text-red-500"></i>
+                Simulateur Physique
+            </h2>
+            <p class="hidden md:block text-xs text-slate-400 mt-1">Configurez les paramètres avant l'exportation des données de télémétrie.</p>
+        </div>
+
+        <div class="p-4 md:p-5 flex-1 overflow-y-auto space-y-5 md:space-y-6">
+            
+            <!-- Nombre de tours -->
+            <div class="space-y-2">
+                <label class="text-xs md:text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <i data-lucide="repeat" class="w-4 h-4 text-slate-500"></i> Nombre de tours
+                </label>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="sim-laps" min="1" max="10" value="3" class="flex-1 accent-red-500" oninput="document.getElementById('laps-val').innerText = this.value">
+                    <span id="laps-val" class="w-8 text-center font-mono font-bold text-base md:text-lg text-red-400 bg-slate-950 rounded py-1 border border-slate-800">3</span>
+                </div>
+            </div>
+
+            <!-- Carburant -->
+            <div class="space-y-2">
+                <label class="text-xs md:text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <i data-lucide="droplet" class="w-4 h-4 text-cyan-500"></i> Carburant de départ (Litres)
+                </label>
+                <input type="number" id="sim-fuel" value="15.0" step="0.5" min="1" max="18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white outline-none focus:border-cyan-500 font-mono text-sm md:text-base">
+            </div>
+
+            <!-- Mode de pilotage -->
+            <div class="space-y-3">
+                <label class="text-xs md:text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <i data-lucide="gauge" class="w-4 h-4 text-orange-500"></i> Rythme de pilotage
+                </label>
+                
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-2.5 md:p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-600 transition-colors">
+                        <input type="radio" name="sim-style" value="chauffe" class="accent-orange-500 w-4 h-4 shrink-0">
+                        <div>
+                            <p class="text-xs md:text-sm font-bold text-slate-200">Tour de chauffe</p>
+                            <p class="text-[9px] md:text-[10px] text-slate-500 leading-tight mt-0.5">Vitesse -20%, Angle max 35°, Freinages doux</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-2.5 md:p-3 bg-slate-950 border border-red-500/50 rounded-lg cursor-pointer hover:border-red-500 transition-colors">
+                        <input type="radio" name="sim-style" value="course" checked class="accent-red-500 w-4 h-4 shrink-0">
+                        <div>
+                            <p class="text-xs md:text-sm font-bold text-slate-200">Rythme de course</p>
+                            <p class="text-[9px] md:text-[10px] text-slate-500 leading-tight mt-0.5">Vitesse standard, Angle max 45°, Freinages forts</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-2.5 md:p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-purple-500 transition-colors">
+                        <input type="radio" name="sim-style" value="qualif" class="accent-purple-500 w-4 h-4 shrink-0">
+                        <div>
+                            <p class="text-xs md:text-sm font-bold text-purple-400">Mode Qualif (Time Attack)</p>
+                            <p class="text-[9px] md:text-[10px] text-slate-500 leading-tight mt-0.5">Vitesse +20%, Angle max 55°, Freinages violents</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-3 md:p-5 border-t border-slate-800 bg-slate-900/50 shrink-0">
+            <button onclick="generateAndDownload()" class="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold py-3 md:py-3 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95 text-sm md:text-base">
+                <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                Générer CSV
+            </button>
+            <p id="export-status" class="text-center text-[10px] text-green-400 mt-1.5 md:mt-2 font-mono h-3 md:h-4 opacity-0 transition-opacity">Export réussi !</p>
+        </div>
+    </aside>
+
+    <script>
+        // --- INITIALISATION ---
+        lucide.createIcons();
+
+        let map;
+        let points = [];
+        let polylineLayer;
+        let markersLayer;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Centrage par défaut sur le Circuit du Roussillon
+            map = L.map('map').setView([42.7795, 2.9078], 17);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri'
+            }).addTo(map);
+
+            polylineLayer = L.polyline([], {color: '#ef4444', weight: 4}).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+
+            map.on('click', function(e) {
+                points.push(e.latlng);
+                updateMapDrawings();
+            });
+
+            // Gérer le redimensionnement pour Leaflet (passage portrait/paysage sur mobile)
+            window.addEventListener('resize', () => {
+                map.invalidateSize();
+            });
+        });
+
+        // --- GESTION DE LA CARTE ---
+        function updateMapDrawings() {
+            polylineLayer.setLatLngs(points);
+            markersLayer.clearLayers();
+            
+            points.forEach((pt, index) => {
+                const isStart = index === 0;
+                const color = isStart ? '#10b981' : '#f87171';
+                const size = isStart ? 12 : 8;
+                const markerHtml = `<div style="background-color: ${color}; width: ${size}px; height: ${size}px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.5);"></div>`;
+                
+                const icon = L.divIcon({
+                    html: markerHtml,
+                    className: '',
+                    iconSize: [size, size],
+                    iconAnchor: [size/2, size/2]
+                });
+                
+                L.marker(pt, {icon: icon}).addTo(markersLayer);
+            });
+        }
+
+        function undoLastPoint() {
+            if (points.length > 0) {
+                points.pop();
+                updateMapDrawings();
+            }
+        }
+
+        function clearMap() {
+            if (confirm("Effacer tout le tracé ?")) {
+                points = [];
+                updateMapDrawings();
+            }
+        }
+
+        // --- IMPORTATION DU TRACÉ (CSV) ---
+        function importCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                if (lines.length < 2) return;
+
+                const headers = lines[0].trim().split(',');
+                const idxLat = headers.indexOf('Lat');
+                const idxLng = headers.indexOf('Lng');
+
+                if (idxLat === -1 || idxLng === -1) {
+                    alert("Format CSV invalide : colonnes Lat et Lng introuvables.");
+                    return;
+                }
+
+                points = []; // Efface la carte actuelle
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    const values = line.split(',');
+                    const lat = parseFloat(values[idxLat]);
+                    const lng = parseFloat(values[idxLng]);
+
+                    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                        points.push(L.latLng(lat, lng));
+                    }
+                }
+
+                updateMapDrawings();
+                
+                if (points.length > 0) {
+                    map.fitBounds(L.latLngBounds(points), { padding: [30, 30] });
+                }
+                
+                event.target.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        }
+
+        // --- OUTILS MATHÉMATIQUES ---
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const phi1 = lat1 * Math.PI / 180;
+            const phi2 = lat2 * Math.PI / 180;
+            const dphi = (lat2 - lat1) * Math.PI / 180;
+            const dlambda = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dphi/2)**2 + Math.cos(phi1) * Math.cos(phi2) * Math.sin(dlambda/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function randomFloat(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // --- MOTEUR PHYSIQUE ET GÉNÉRATION ---
+        function generateAndDownload() {
+            if (points.length < 5) {
+                alert("Le tracé est trop court ! Placez plus de points ou importez un CSV.");
+                return;
+            }
+
+            // Récupération des paramètres de l'UI
+            const numLaps = parseInt(document.getElementById('sim-laps').value);
+            let currentFuel = parseFloat(document.getElementById('sim-fuel').value) || 15.0;
+            const simStyle = document.querySelector('input[name="sim-style"]:checked').value;
+
+            // Définition des modificateurs selon le style de pilotage
+            let speedMod = 1.0;
+            let rollMaxMod = 45;
+            let pitchBrakeMod = -1.0;
+            
+            if (simStyle === 'chauffe') {
+                speedMod = 0.8;  // Plus lent
+                rollMaxMod = 35; // Penche moins
+                pitchBrakeMod = -0.5; // Freine doucement
+            } else if (simStyle === 'qualif') {
+                speedMod = 1.25; // Très rapide
+                rollMaxMod = 55; // Slider frotte
+                pitchBrakeMod = -1.5; // Gros transfert de charge
+            }
+
+            // Construction de la boucle de points pour X tours
+            let tousLesPoints = [...points];
+            // On ajoute les tours supplémentaires (sans dupliquer le premier point à chaque fois)
+            for (let t = 1; t < numLaps; t++) {
+                tousLesPoints = tousLesPoints.concat(points.slice(1));
+            }
+
+            let csvContent = "Time_ms,Lat,Lng,Speed_kmh,Satellites,Roll_deg,Pitch_deg,G_Total,G_Long,Fuel_L\n";
+            let currentTimeMs = 0.0;
+            let isTurningRight = true;
+
+            // Boucle de simulation physique
+            for (let i = 0; i < tousLesPoints.length; i++) {
+                const pt = tousLesPoints[i];
+                
+                // Calcul de l'espacement pour deviner la topologie du circuit
+                let dist_prev = 15.0, dist_next = 15.0;
+                if (i > 0) dist_prev = getDistance(pt.lat, pt.lng, tousLesPoints[i-1].lat, tousLesPoints[i-1].lng);
+                if (i < tousLesPoints.length - 1) dist_next = getDistance(pt.lat, pt.lng, tousLesPoints[i+1].lat, tousLesPoints[i+1].lng);
+                const avg_dist = (dist_prev + dist_next) / 2.0;
+
+                let speed, roll, pitch, g_long;
+
+                // Application des règles physiques en fonction de l'espacement des points
+                if (avg_dist < 12) {
+                    speed = (50 + randomFloat(0, 15)) * speedMod;
+                    roll = Math.min(rollMaxMod, 45 + randomFloat(0, 8));
+                    pitch = pitchBrakeMod;
+                    g_long = pitchBrakeMod * 0.9;
+                } else if (avg_dist < 25) {
+                    speed = (80 + randomFloat(0, 20)) * speedMod;
+                    roll = Math.min(rollMaxMod, 30 + randomFloat(0, 10));
+                    pitch = pitchBrakeMod * 0.5;
+                    g_long = pitchBrakeMod * 0.4;
+                } else if (avg_dist < 45) {
+                    speed = (120 + randomFloat(0, 30)) * speedMod;
+                    roll = Math.min(rollMaxMod, 15 + randomFloat(0, 5));
+                    pitch = 1.0 * speedMod; // Accélération
+                    g_long = 0.6 * speedMod;
+                } else {
+                    speed = (180 + randomFloat(0, 50)) * speedMod;
+                    roll = randomFloat(0, 3);
+                    pitch = 2.0 * speedMod; // Forte accélération
+                    g_long = 1.1 * speedMod;
+                }
+
+                // Alternance dynamique des virages (gauche / droite)
+                if (roll > 10) {
+                    if (Math.random() > 0.8) isTurningRight = !isTurningRight;
+                    if (!isTurningRight) roll = -roll;
+                }
+
+                const g_total = randomFloat(1.1, 1.3);
+
+                // Écriture de la ligne CSV
+                csvContent += `${Math.round(currentTimeMs)},${pt.lat.toFixed(6)},${pt.lng.toFixed(6)},${speed.toFixed(1)},12,${roll.toFixed(1)},${pitch.toFixed(1)},${g_total.toFixed(2)},${g_long.toFixed(2)},${currentFuel.toFixed(2)}\n`;
+
+                // Calcul du temps et conso vers le prochain point
+                if (i < tousLesPoints.length - 1) {
+                    const speed_ms = speed / 3.6;
+                    const time_to_next = speed_ms > 0 ? (dist_next / speed_ms) * 1000 : 1000;
+                    currentTimeMs += time_to_next;
+                    currentFuel = Math.max(0, currentFuel - (dist_next * 0.0002 * speedMod)); // Conso dépend du rythme
+                }
+            }
+
+            // Déclenchement du téléchargement
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `test_${numLaps}tours_${simStyle}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Feedback visuel
+            const status = document.getElementById('export-status');
+            status.style.opacity = '1';
+            setTimeout(() => status.style.opacity = '0', 3000);
+        }
+    </script>
+</body>
+</html>
