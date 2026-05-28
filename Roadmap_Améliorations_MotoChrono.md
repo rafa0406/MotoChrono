@@ -10,11 +10,25 @@
 - [ ] **Sécurisation du Signal Injecteur :**
   - Remplacer la diode 1N4007 par une diode de commutation rapide (ex: 1N4148).
   - Ajouter une résistance de pull-down côté ESP32 pour garantir un signal propre et éviter les rebonds.
+  Valeur de résistance recommandée : 1 kΩ (ou 2.2 kΩ maximum)
+  Tolérance : 1% ou 5% (classique)
+  Puissance : 1/4 W (standard)
+  [Côté sortie Optocoupleur - Broches 3 et 4]
+
+````Broche 4 (Collecteur) ----------------------> +3.3V (Alimentation propre de l'ESP32)
+
+Broche 3 (Émetteur)   -----+----------------> GPIO 1 de l'ESP32 (Broche d'interruption)
+                           |
+                           Z
+                           Z  Résistance de Pull-Down (1 kΩ)
+                           Z
+                           |
+                           +----------------> GND (Masse de l'ESP32)
+````
 - [ ] **Fiabilisation Mécanique (Track-Ready) :**
   - Appliquer du vernis tropicalisant (Conformal Coating) sur le PCB (attention à masquer le baromètre/IMU et les connecteurs).
   - Monter le boîtier complet sur silent blocs (caoutchouc ou mousse haute densité) pour absorber les vibrations moteur (11 000 tr/min).
-- [ ] **Lisibilité Écran :**
-  - Poser un film mat anti-reflet sur l'écran IPS ST7789 pour garantir la lecture en plein soleil.
+
 
 ---
 
