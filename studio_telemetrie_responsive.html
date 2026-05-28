@@ -293,9 +293,9 @@
 
             // Construction de la boucle de points pour X tours
             let tousLesPoints = [...points];
-            // On ajoute les tours supplémentaires (sans dupliquer le premier point à chaque fois)
+            // On ajoute les tours supplémentaires en gardant le point de départ vital !
             for (let t = 1; t < numLaps; t++) {
-                tousLesPoints = tousLesPoints.concat(points.slice(1));
+                tousLesPoints = tousLesPoints.concat(points);
             }
 
             let csvContent = "Time_ms,Lat,Lng,Speed_kmh,Satellites,Roll_deg,Pitch_deg,G_Total,G_Long,Fuel_L\n";

@@ -406,8 +406,9 @@
             const laps = [];
             let currentLapPoints = [];
             let lastCrossingTime = 0;
-            const MIN_LAP_TIME_MS = 25000;
-            const DETECTION_RADIUS_METER = 20;
+            // Remplace les lignes 275-276 par ceci :
+            const MIN_LAP_TIME_MS = 45000; // 45 secondes minimum (Évite les faux tours au milieu du circuit)
+            const DETECTION_RADIUS_METER = 15; // 15 mètres (Plus précis)
 
             rawTelemetryData.forEach((pt) => {
                 const dist = getDistance(pt.lat, pt.lng, startFinishGate.lat, startFinishGate.lng);
