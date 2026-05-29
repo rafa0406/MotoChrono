@@ -88,29 +88,40 @@ void core0Task(void * pvParameters) {
 }
 
 void core1Task(void * pvParameters) {
+  String serialBuffer = ""; // Buffer pour stocker la commande reçue
+  bool virtualButtonActive = false;
+
   for(;;) {
-    // --- INTERFACE (Affichage) ---
-    bool buttonPressed = (digitalRead(PIN_BUTTON) == LOW);
+    // --- LECTURE NON-BLOQUANTE DU PORT SÉRIE ---
+    while (Serial.available() > 0) {
+      char c = Serial.read();
+      if (c == '\n' || c == '\r') {
+        serialBuffer.trim(); // On nettoie les espaces
+        if (serialBuffer == "BTN1") {
+          virtualButtonActive = true;
+          Serial.println(F("[SIM] 🕹️ Commande 'BTN1' reçue ! Changement de page..."));
+        }
+        serialBuffer = ""; // On vide le buffer pour la prochaine commande
+      } else {
+        serialBuffer += c; // On accumule les caractères
+      }
+    }
+
+    // --- LECTURE DU BOUTON (PHYSIQUE OU VIRTUEL) ---
+    // Le bouton est considéré comme pressé si GPIO à l'état LOW -OU- si commande série reçue
+    bool buttonPressed = (digitalRead(PIN_BUTTON) == LOW) || virtualButtonActive;
+
+    // Mise à jour de l'écran
     DisplayManager::update(buttonPressed);
 
-    // --- STOCKAGE (Carte SD) ---
+    // Reset du bouton virtuel après traitement
+    if (virtualButtonActive) {
+      virtualButtonActive = false;
+    }
+
+    // Écriture SD
     SDLogger::logData();
 
-    // --- GESTION DE LA COUPURE MOTEUR ---
-    // On simule ici la coupure de contact si on détecte un état HIGH
-    // (Ajuster selon le câblage réel de l'optocoupleur)
-    /* if(digitalRead(PIN_IGNITION) == HIGH) { 
-      Serial.println(F("Contact coupé ! Sauvegarde en cours..."));
-      FuelManager::forceSave();
-      SDLogger::closeFile();
-      DisplayManager::showByeBye();
-      
-      delay(1000); // Laisse le temps à l'écran d'afficher le message
-      esp_deep_sleep_start();
-    }
-    */
-
-    // L'écran et la SD n'ont pas besoin d'être mis à jour à 100Hz
     vTaskDelay(pdMS_TO_TICKS(50)); // Boucle à ~20Hz
   }
 }

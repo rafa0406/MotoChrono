@@ -20,11 +20,11 @@
 #define PIN_GPS_RX        5   // IO5 : À connecter au TX du module GPS
 #define GPS_BAUDRATE      9600 
 
-// --- SPI EXTERNE (Lecteur Carte MicroSD) ---
-#define PIN_SPI_SCK       12  // SCK partagé avec l'écran
-#define PIN_SPI_MOSI      11  // MOSI partagé avec l'écran
-#define PIN_SPI_MISO      14  // MISO (Data Out) exclusif à la SD
-#define PIN_SD_CS         15  // Chip Select de la carte SD
+// --- SPI EXTERNE (Lecteur Carte MicroSD selon doc Waveshare) ---
+#define PIN_SPI_SCK       21  // SD_CLK
+#define PIN_SPI_MOSI      18  // SD_MOSI
+#define PIN_SPI_MISO      16  // SD_MISO
+#define PIN_SD_CS         17  // SD_CS
 
 // ==========================================
 // == CONSTANTES & PARAMÈTRES MÉTIER       ==
