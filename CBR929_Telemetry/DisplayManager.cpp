@@ -42,26 +42,38 @@ DisplayPage DisplayManager::currentPage = PAGE_ROUTE;
 unsigned long DisplayManager::lastButtonPressMs = 0;
 
 void DisplayManager::init() {
-    Serial.println(F("[DISPLAY] Initialisation de l'écran LCD..."));
-
-    // Initialisation du hardware TFT
+    Serial.println(F("[DISPLAY] 1. Début init TFT..."));
     tft.init();
-    tft.setRotation(0); // Ajuster (0, 1, 2, 3) selon le sens de montage sur la moto
+    Serial.println(F("[DISPLAY] 2. TFT Init OK"));
+
+    tft.setRotation(0);
+    Serial.println(F("[DISPLAY] 3. Rotation OK"));
+
     tft.fillScreen(TFT_BLACK);
+    Serial.println(F("[DISPLAY] 4. FillScreen OK"));
 
-    // Création du Sprite 240x240 (Taille exacte de l'écran 1.3")
-    spr.createSprite(240, 240);
-    spr.setTextDatum(MC_DATUM); // Alignement du texte au centre par défaut
+    Serial.println(F("[DISPLAY] 5. Allocation du Sprite..."));
+    void* ptr = spr.createSprite(240, 240);
+    
+    // SÉCURITÉ ABSOLUE : On vérifie si l'ESP32 nous a bien donné la RAM
+    if (ptr == nullptr) {
+        Serial.println(F("[DISPLAY] ❌ ERREUR FATALE : Impossible d'allouer la mémoire du Sprite !"));
+        return; // On arrête tout avant de crasher
+    }
+    Serial.println(F("[DISPLAY] 6. Sprite alloué avec succès !"));
 
-    // Écran de démarrage
+    spr.setTextDatum(MC_DATUM); 
     spr.fillSprite(TFT_BLACK);
     spr.setTextColor(TFT_RED);
-    spr.drawString("CBR 929 RR", 120, 100, 4); // Police taille 4
+    spr.drawString("CBR 929 RR", 120, 100, 4);
     spr.setTextColor(TFT_WHITE);
     spr.drawString("System Init...", 120, 140, 2);
-    spr.pushSprite(0, 0); // Envoi du sprite à l'écran
-
-    delay(1500); // Petite pause pour le style
+    
+    Serial.println(F("[DISPLAY] 7. Envoi de l'image (PushSprite)..."));
+    spr.pushSprite(0, 0); 
+    
+    Serial.println(F("[DISPLAY] 8. Initialisation 100% Terminée !"));
+    delay(1500);
 }
 
 void DisplayManager::update(bool isButtonPressed) {

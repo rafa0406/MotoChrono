@@ -1,14 +1,14 @@
-#include "ImuManager.h" // Inclusion cruciale du header corrigé !
-#include "Config.h"     // Inclusion de ta config si nécessaire
+#include "IMUManager.h"
+#include "Config.h"
 
 // Définition des broches I2C internes de ta carte Waveshare
 #define I2C_SDA_INTERNAL 6
 #define I2C_SCL_INTERNAL 7
 #define QMI8658_ADDRESS  0x6B // Adresse I2C standard du QMI8658
 
-// --- Allocation mémoire des variables statiques de la classe ---
-Madgwick IMUManager::filter;
 Preferences IMUManager::preferences;
+
+Madgwick IMUManager::filter;
 
 unsigned long IMUManager::lastUpdateMicros = 0;
 
@@ -37,36 +37,87 @@ void IMUManager::init() {
     Serial.print(F(" | Tangage: "));
     Serial.println(pitchOffset);
 
-    // Initialisation du bus I2C interne de la carte Waveshare
+    // --- INITIALISATION DU CAPTEUR (Bus I2C) ---
     Wire.begin(I2C_SDA_INTERNAL, I2C_SCL_INTERNAL);
-    
-    // Initialisation du filtre de Madgwick (ex: à 100 Hz)
-    filter.begin(100);
+    Wire.setClock(400000); // I2C Fast Mode (400 kHz) pour lecture très rapide
 
-    // [!] Ici, il faudra envoyer les commandes I2C pour réveiller ton capteur QMI8658
-    // Wire.beginTransmission(QMI8658_ADDRESS);
-    // ...
+    // 1. Configuration CTRL1 (Adresse auto-increment)
+    Wire.beginTransmission(QMI8658_ADDRESS);
+    Wire.write(0x02); 
+    Wire.write(0x60); 
+    Wire.endTransmission();
+
+    // 2. Configuration CTRL2 : Accéléromètre (±8g, 1000Hz)
+    Wire.beginTransmission(QMI8658_ADDRESS);
+    Wire.write(0x03); 
+    Wire.write(0x24); 
+    Wire.endTransmission();
+
+    // 3. Configuration CTRL3 : Gyroscope (±512 °/s, 1000Hz)
+    Wire.beginTransmission(QMI8658_ADDRESS);
+    Wire.write(0x04); 
+    Wire.write(0x54); 
+    Wire.endTransmission();
+
+    // 4. Configuration CTRL7 : Activation des capteurs
+    Wire.beginTransmission(QMI8658_ADDRESS);
+    Wire.write(0x08); 
+    Wire.write(0x03); // Activer Gyro et Accel
+    Wire.endTransmission();
+
+    // Initialisation du filtre de Madgwick (~100 Hz correspondant à notre Tâche Core 0)
+    filter.begin(100);
 }
 
 // ==========================================
 // == BOUCLE DE MISE À JOUR (CORE 0)       ==
 // ==========================================
 void IMUManager::update() {
-    // --- 1. Lecture I2C des données brutes (Ax, Ay, Az, Gx, Gy, Gz) ---
-    // Remplace ces variables par tes vraies lectures I2C du capteur QMI8658
-    float ax = 0.0f, ay = 0.0f, az = 1.0f; // Variables factices pour compiler
-    float gx = 0.0f, gy = 0.0f, gz = 0.0f; 
+    // Pointer sur le premier registre de données (0x35 : Accel X Low)
+    Wire.beginTransmission(QMI8658_ADDRESS);
+    Wire.write(0x35); 
+    if (Wire.endTransmission(false) != 0) return; // Sécurité si capteur non trouvé
 
-    // --- 2. Mise à jour du filtre de Madgwick ---
-    filter.updateIMU(gx, gy, gz, ax, ay, az);
+    // Demander la lecture des 12 octets consécutifs (6 axes * 2 octets)
+    Wire.requestFrom(QMI8658_ADDRESS, 12);
+    
+    if(Wire.available() == 12) {
+        // Lecture brute de l'accéléromètre
+        int16_t ax_raw = Wire.read() | (Wire.read() << 8);
+        int16_t ay_raw = Wire.read() | (Wire.read() << 8);
+        int16_t az_raw = Wire.read() | (Wire.read() << 8);
+        
+        // Lecture brute du gyroscope
+        int16_t gx_raw = Wire.read() | (Wire.read() << 8);
+        int16_t gy_raw = Wire.read() | (Wire.read() << 8);
+        int16_t gz_raw = Wire.read() | (Wire.read() << 8);
 
-    // --- 3. Récupération et application de la calibration ---
-    currentRoll = filter.getRoll() - rollOffset;
-    currentPitch = filter.getPitch() - pitchOffset;
+        // --- CONVERSIONS ---
+        // Accéléromètre paramétré à ±8g -> 4096 LSB/g
+        float ax = ax_raw / 4096.0f; 
+        float ay = ay_raw / 4096.0f;
+        float az = az_raw / 4096.0f;
+        
+        // Gyroscope paramétré à ±512 dps -> 64 LSB/dps
+        float gx = gx_raw / 64.0f;   
+        float gy = gy_raw / 64.0f;
+        float gz = gz_raw / 64.0f;
 
-    // --- 4. Calcul des forces G ---
-    currentGTotal = sqrt((ax * ax) + (ay * ay) + (az * az));
-    currentGLong = ay; // À adapter selon le sens physique de montage de ta carte !
+        // --- MISE À JOUR DU FILTRE ---
+        filter.updateIMU(gx, gy, gz, ax, ay, az);
+
+        // --- APPLICATION DE LA CALIBRATION ---
+        currentRoll = filter.getRoll() - rollOffset;
+        currentPitch = filter.getPitch() - pitchOffset;
+
+        // --- CALCUL DES FORCES G ---
+        currentGTotal = sqrt((ax * ax) + (ay * ay) + (az * az));
+        
+        // La Force G longitudinale (freinage/accélération) dépend du sens de la carte !
+        // Si ta carte est à plat, le freinage se lira souvent sur l'axe Y ou X. 
+        // À ajuster selon le montage final (ex: currentGLong = ay;)
+        currentGLong = ay; 
+    }
 }
 
 // ==========================================
@@ -75,14 +126,11 @@ void IMUManager::update() {
 void IMUManager::calibrateZero() {
     Serial.println(F("[IMU] Calibration du Zéro en cours... Maintenez la moto droite !"));
     
-    // On attend un peu que le filtre se stabilise
     delay(1000); 
     
-    // On enregistre les angles actuels comme étant le nouveau point zéro
     rollOffset = filter.getRoll();
     pitchOffset = filter.getPitch();
     
-    // --- SAUVEGARDE NVS IMMÉDIATE ---
     preferences.begin("imu_data", false);
     preferences.putFloat("roll_off", rollOffset);
     preferences.putFloat("pitch_off", pitchOffset);
@@ -94,18 +142,7 @@ void IMUManager::calibrateZero() {
 // ==========================================
 // == GETTERS (Accesseurs)                 ==
 // ==========================================
-float IMUManager::getRoll() {
-    return currentRoll;
-}
-
-float IMUManager::getPitch() {
-    return currentPitch;
-}
-
-float IMUManager::getGForceTotal() {
-    return currentGTotal;
-}
-
-float IMUManager::getGForceLong() {
-    return currentGLong;
-}
+float IMUManager::getRoll() { return currentRoll; }
+float IMUManager::getPitch() { return currentPitch; }
+float IMUManager::getGForceTotal() { return currentGTotal; }
+float IMUManager::getGForceLong() { return currentGLong; }
