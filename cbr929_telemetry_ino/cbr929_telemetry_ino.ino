@@ -2,6 +2,10 @@
   Projet : Télémétrie & Tableau de Bord pour Honda CBR 929 RR
   Architecture : ESP32-S3 (Dual Core) avec QMI8658 & ST7789
   Description : Fichier principal orchestrant les différents modules.
+====== Bibliothèques externes ======
+- TFT_eSPI (de Bodmer) : C'est la bibliothèque ultra-rapide et optimisée qui gère l'affichage sur ton écran IPS ST7789.
+- TinyGPSPlus (de Mikal Hart) : Elle permet de décoder (parser) les trames NMEA brutes envoyées par ton module GPS (ATGM336H/BN-220) pour en extraire la vitesse, la latitude et la longitude.
+- Madgwick (de Arduino)(souvent nommée MadgwickAHRS) : C'est l'algorithme mathématique de fusion de capteurs qui va transformer les données brutes du QMI8658 (accéléromètre + gyroscope) en angles d'inclinaison (roulis et tangage) exploitables.
 */
 
 #include "Config.h"
