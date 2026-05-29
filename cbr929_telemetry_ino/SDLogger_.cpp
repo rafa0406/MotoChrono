@@ -1,9 +1,7 @@
 #include "SDLogger.h"
 #include "Config.h"
-
-// Inclusions des autres modules pour récupérer leurs données en direct
-#include "GPSManager.h"
-#include "IMUManager.h"
+#include "GpsManager.h"
+#include "ImuManager.h"
 #include "FuelManager.h"
 
 bool SDLogger::isInitialized = false;

@@ -16,6 +16,10 @@
 // #include "DisplayManager.h"
 // #include "SDLogger.h"
 
+// --- Déclaration des prototypes des fonctions ---
+void core0Task(void * pvParameters);
+void core1Task(void * pvParameters);
+
 // --- Tâches FreeRTOS pour le Dual Core ---
 TaskHandle_t TaskCore0; // Gèrera l'Acquisition (Interruptions, GPS, IMU)
 TaskHandle_t TaskCore1; // Gèrera l'Affichage et le Datalogging SD
