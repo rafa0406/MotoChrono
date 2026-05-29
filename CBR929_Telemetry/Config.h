@@ -20,12 +20,11 @@
 #define PIN_GPS_RX        5   // IO5 : À connecter au TX du module GPS
 #define GPS_BAUDRATE      9600 
 
-// ==========================================
-// == BROCHES INTERNES (Câblées en usine)  ==
-// ==========================================
-// L'écran LCD (ST7789) utilise un bus SPI interne.
-// L'IMU (QMI8658) utilise un bus I2C interne.
-// Le lecteur MicroSD utilise un bus interne (SDIO ou SPI).
+// --- SPI EXTERNE (Lecteur Carte MicroSD) ---
+#define PIN_SPI_SCK       12  // SCK partagé avec l'écran
+#define PIN_SPI_MOSI      11  // MOSI partagé avec l'écran
+#define PIN_SPI_MISO      14  // MISO (Data Out) exclusif à la SD
+#define PIN_SD_CS         15  // Chip Select de la carte SD
 
 // ==========================================
 // == CONSTANTES & PARAMÈTRES MÉTIER       ==
