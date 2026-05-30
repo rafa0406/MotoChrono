@@ -1,10 +1,6 @@
 #include "IMUManager.h"
 #include "Config.h"
 
-// Broches I2C internes de ta carte Waveshare
-#define I2C_SDA_INTERNAL 6
-#define I2C_SCL_INTERNAL 7
-
 uint8_t qmi8658_address = 0x6B; // On testera 0x6B, puis 0x6A
 bool imuFound = false;
 

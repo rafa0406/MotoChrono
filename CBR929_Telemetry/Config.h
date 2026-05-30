@@ -26,6 +26,10 @@
 #define PIN_SPI_MISO      16  // SD_MISO
 #define PIN_SD_CS         17  // SD_CS
 
+// Broches I2C internes de ta carte Waveshare
+#define I2C_SDA_INTERNAL 47
+#define I2C_SCL_INTERNAL 48
+
 // ==========================================
 // == CONSTANTES & PARAMÈTRES MÉTIER       ==
 // ==========================================
