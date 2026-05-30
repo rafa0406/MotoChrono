@@ -24,6 +24,10 @@ private:
 
     static DisplayPage currentPage;
     static unsigned long lastButtonPressMs;
+
+    // Historique des inclinaisons pour la page Piste
+    static float maxLeanLeft;
+    static float maxLeanRight;
 };
 
 #endif // DISPLAYMANAGER_H
