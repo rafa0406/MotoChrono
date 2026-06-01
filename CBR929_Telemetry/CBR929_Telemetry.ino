@@ -17,6 +17,7 @@
 #include "IMUManager.h"
 #include "DisplayManager.h"
 #include "SDLogger.h"
+#include "WebServerManager.h"
 
 // --- Déclaration des prototypes des fonctions ---
 void core0Task(void * pvParameters);
@@ -32,7 +33,8 @@ void setup() {
 
   // 1. Initialisation des Pins de base
   pinMode(PIN_IGNITION, INPUT_PULLUP);
-  pinMode(PIN_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_BUTTON1, INPUT_PULLUP);
+  pinMode(PIN_BUTTON2, INPUT_PULLUP);
   
   // (Note : Le pin de l'injecteur est géré dans FuelManager::init)
 
@@ -43,6 +45,7 @@ void setup() {
   GPSManager::init();
   IMUManager::init();
   SDLogger::init();
+  WebServerManager::init();
 
   // 3. Lancement des tâches sur les deux cœurs
   // Core 0 (Priorité haute) : Acquisition des données critiques
@@ -90,10 +93,15 @@ void core0Task(void * pvParameters) {
 void core1Task(void * pvParameters) {
   String serialBuffer = "";
   
-  // Variables pour gérer l'état du bouton physique (Anti-rebond et durée)
-  bool wasPhysicallyPressed = false;
-  unsigned long physicalPressStartTime = 0;
-  bool longPressHandled = false;
+  // Variables Bouton 1 (Page / Calib)
+  // On lit l'état réel au boot pour éviter un faux déclenchement si la broche flotte
+  bool wasBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
+  unsigned long btn1PressStartTime = 0;
+  bool btn1LongPressHandled = false;
+
+  // Variables Bouton 2 (Start / Stop REC)
+  // On lit l'état réel au boot pour éviter que l'enregistrement ne démarre tout seul
+  bool wasBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
 
   for(;;) {
     bool triggerShortPress = false;
@@ -105,51 +113,65 @@ void core1Task(void * pvParameters) {
         serialBuffer.trim();
         if (serialBuffer == "BTN1") {
           triggerShortPress = true;
-          Serial.println(F("[SIM] 🕹️ Commande 'BTN1' reçue -> Changement de page."));
+          Serial.println(F("[SIM] 🕹️ 'BTN1' reçu -> Changement de page."));
         } else if (serialBuffer == "BTN1_RESET_IMU") {
-          Serial.println(F("[SIM] 🛠️ Commande 'BTN1_RESET_IMU' reçue -> Calibration IMU."));
+          Serial.println(F("[SIM] 🛠️ 'BTN1_RESET_IMU' reçu -> Calibration IMU."));
           IMUManager::calibrateZero();
+        } else if (serialBuffer == "BTN2") {
+          Serial.println(F("[SIM] 🕹️ 'BTN2' reçu -> Start/Stop Enregistrement."));
+          SDLogger::toggleRecording();
         }
         serialBuffer = "";
       } else {
-        serialBuffer += c;
+        serialBuffer += c; // On accumule les caractères
       }
     }
 
-    // --- 2. GESTION DU BOUTON PHYSIQUE (Court vs Long 5s) ---
-    // Rappel : PIN_BUTTON est en INPUT_PULLUP, donc LOW quand il est pressé
-    bool isPhysicallyPressed = (digitalRead(PIN_BUTTON) == LOW);
-
-    if (isPhysicallyPressed && !wasPhysicallyPressed) {
-        // Front descendant : l'utilisateur vient d'appuyer sur le bouton
-        physicalPressStartTime = millis();
-        wasPhysicallyPressed = true;
-        longPressHandled = false;
-    } 
-    else if (isPhysicallyPressed && wasPhysicallyPressed) {
-        // Le bouton est maintenu enfoncé : on vérifie si le délai de 5s est atteint
-        if (!longPressHandled && (millis() - physicalPressStartTime >= 5000)) {
-            Serial.println(F("[SYSTEM] ⏱️ Appui long 5s détecté -> Calibration IMU (Sauvegarde NVS)..."));
+    // --- 2. GESTION DU BOUTON 1 (Court vs Long 5s) ---
+    bool isBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
+    
+    if (isBtn1Pressed && !wasBtn1Pressed) {
+        // Front descendant : l'utilisateur vient d'appuyer
+        btn1PressStartTime = millis();
+        wasBtn1Pressed = true;
+        btn1LongPressHandled = false;
+    } else if (isBtn1Pressed && wasBtn1Pressed) {
+        // Bouton maintenu : on vérifie les 5 secondes
+        if (!btn1LongPressHandled && (millis() - btn1PressStartTime >= 5000)) {
+            Serial.println(F("[SYSTEM] ⏱️ Calibration IMU (Sauvegarde NVS)..."));
             IMUManager::calibrateZero();
-            longPressHandled = true; // Flag pour ne pas recalibrer en boucle si on garde appuyé 10s
+            btn1LongPressHandled = true; // On bloque pour ne pas recalibrer en boucle
         }
-    } 
-    else if (!isPhysicallyPressed && wasPhysicallyPressed) {
-        // Front montant : l'utilisateur relâche le bouton
-        if (!longPressHandled) {
-            // S'il a relâché AVANT les 5 secondes, on le considère comme un appui court
-            triggerShortPress = true;
+    } else if (!isBtn1Pressed && wasBtn1Pressed) {
+        // Front montant : l'utilisateur relâche
+        if (!btn1LongPressHandled) {
+            triggerShortPress = true; // Si pas de long press, c'est un changement de page
         }
-        wasPhysicallyPressed = false; // Reset de l'état
+        wasBtn1Pressed = false; 
     }
 
-    // --- 3. MISE À JOUR DE L'ÉCRAN ---
-    // Le paramètre de update() gère le changement de page
+    // --- 3. GESTION DU BOUTON 2 (Start / Stop REC) ---
+    bool isBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
+    
+    if (isBtn2Pressed && !wasBtn2Pressed) {
+        // Front descendant uniquement : on bascule l'état d'enregistrement
+        SDLogger::toggleRecording();
+    }
+    wasBtn2Pressed = isBtn2Pressed; // Sauvegarde de l'état pour le prochain cycle
+
+    // --- 4. MISE À JOUR DE L'ÉCRAN ---
+    // Le paramètre gère le changement de page si triggerShortPress est true
     DisplayManager::update(triggerShortPress);
 
-    // --- 4. ÉCRITURE SD ---
+    // --- 5. ÉCRITURE SD ---
+    // La fonction contient déjà sa propre sécurité (isRecordingStatus)
     SDLogger::logData();
 
-    vTaskDelay(pdMS_TO_TICKS(50)); // Boucle maintenue de manière stable à ~20Hz
+    // --- 6. GESTION DU SERVEUR WEB ---
+    // Traitement des requêtes WiFi (Téléchargement des CSV/HTML)
+    WebServerManager::handleClient(); 
+
+    // --- 7. PAUSE DE L'OS (Crucial pour le Dual Core) ---
+    vTaskDelay(pdMS_TO_TICKS(50)); // Maintient la boucle à ~20Hz
   }
 }
