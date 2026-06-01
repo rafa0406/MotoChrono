@@ -8,12 +8,20 @@
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite* DisplayManager::spr = nullptr;
 
-DisplayPage DisplayManager::currentPage = PAGE_ROUTE;
+DisplayPage DisplayManager::currentPage = PAGE_PISTE;
 unsigned long DisplayManager::lastButtonPressMs = 0;
 
 // Variables pour l'inclinomètre
 float DisplayManager::maxLeanLeft = 0.0f;
 float DisplayManager::maxLeanRight = 0.0f;
+float DisplayManager::gForceAtMaxLeanLeft = 0.0f;
+float DisplayManager::gForceAtMaxLeanRight = 0.0f;
+
+float DisplayManager::maxPitchUp = 0.0f;
+float DisplayManager::maxPitchDown = 0.0f;
+float DisplayManager::gForceAtMaxPitchUp = 0.0f;
+float DisplayManager::gForceAtMaxPitchDown = 0.0f;
+float DisplayManager::maxGForce = 0.0f;
 
 void DisplayManager::init() {
     Serial.println(F("[DISPLAY] 1. Activation du rétroéclairage..."));
@@ -22,7 +30,7 @@ void DisplayManager::init() {
 
     Serial.println(F("[DISPLAY] 2. Init TFT Hardware..."));
     tft.init(); 
-    tft.setRotation(0); 
+    tft.setRotation(3); 
     tft.fillScreen(TFT_BLACK);
 
     Serial.println(F("[DISPLAY] 3. Allocation Sprite en PSRAM..."));
@@ -94,58 +102,133 @@ void DisplayManager::drawPageRoute() {
 }
 
 void DisplayManager::drawPagePiste() {
-    // ---- 1. Récupération des données ----
-    // Attention : IMUManager doit fournir l'angle "Roll" avec Madgwick (négatif = gauche, positif = droite)
-    float currentLeanAngle = IMUManager::getRoll(); 
+    float currentRoll = IMUManager::getRoll(); 
+    float currentPitch = IMUManager::getPitch();
     float currentSpeed = GPSManager::getSpeedKmh();
+    float currentGForce = IMUManager::getGForceTotal(); 
 
-    // Mise à jour des extremums
-    if (currentLeanAngle < maxLeanLeft) maxLeanLeft = currentLeanAngle;
-    if (currentLeanAngle > maxLeanRight) maxLeanRight = currentLeanAngle;
+    // ---- 2. Mise à jour des extremums ET de la force G associée ----
+    if (currentRoll < maxLeanLeft) {
+        maxLeanLeft = currentRoll;
+        gForceAtMaxLeanLeft = currentGForce;
+    }
+    if (currentRoll > maxLeanRight) {
+        maxLeanRight = currentRoll;
+        gForceAtMaxLeanRight = currentGForce;
+    }
+    if (currentPitch < maxPitchDown) {
+        maxPitchDown = currentPitch;
+        gForceAtMaxPitchDown = currentGForce;
+    }
+    if (currentPitch > maxPitchUp) {
+        maxPitchUp = currentPitch;
+        gForceAtMaxPitchUp = currentGForce;
+    }
+    if (currentGForce > maxGForce) maxGForce = currentGForce;
 
-    // ---- 2. Constantes de dessin ----
-    const int cx = 120; // Centre de l'écran X
-    const int cy = 110; // Centre de l'inclinomètre Y (décalé vers le haut)
-    const int radius = 90; // Rayon du cadran
+    // ---- 3. Statut GPS ----
+    spr->fillCircle(220, 10, 4, GPSManager::isDataValid() ? TFT_GREEN : TFT_RED);
 
-    // ---- 3. Dessin du cadran (Horizon + Cercle) ----
-    spr->drawLine(cx - radius - 10, cy, cx + radius + 10, cy, TFT_DARKGREY); // Horizon
-    spr->drawCircle(cx, cy, radius, TFT_DARKGREY); // Cadran extérieur
+    // ==========================================
+    // BARRE DE ROLL (Horizontale en haut)
+    // ==========================================
+    const int rollW = 160;     
+    const int rollX = 110;     
+    const int rollY = 20;      
+    const float maxRollScale = 90.0f;
+
+    spr->drawRect(rollX - (rollW/2), rollY, rollW, 16, TFT_DARKGREY);
+    spr->drawFastVLine(rollX, rollY, 16, TFT_WHITE); 
+
+    int rx = rollX + (currentRoll / maxRollScale) * (rollW/2);
+    rx = constrain(rx, rollX - (rollW/2), rollX + (rollW/2));
+    spr->fillRect(rx - 4, rollY, 9, 16, TFT_CYAN); 
+
+    int mrl = rollX + (maxLeanLeft / maxRollScale) * (rollW/2);
+    int mrr = rollX + (maxLeanRight / maxRollScale) * (rollW/2);
+    int draw_mrl = constrain(mrl, rollX - (rollW/2), rollX);
+    int draw_mrr = constrain(mrr, rollX, rollX + (rollW/2));
+
+    spr->drawFastVLine(draw_mrl, rollY - 4, 24, TFT_RED);
+    spr->drawFastVLine(draw_mrr, rollY - 4, 24, TFT_RED);
+
+    // Affichage Angle + G Force en dessous (Fond transparent)
+    spr->setTextDatum(TC_DATUM); 
+    spr->setTextColor(TFT_RED); 
     
-    // Le point GPS dans le coin
-    spr->fillCircle(220, 20, 5, GPSManager::isDataValid() ? TFT_GREEN : TFT_RED);
+    // Gauche
+    String rollLeftStr = String((int)abs(maxLeanLeft)) + "  " + String(gForceAtMaxLeanLeft, 1) + "G";
+    spr->drawString(rollLeftStr, draw_mrl, rollY + 14, 2); 
 
-    // ---- 4. Aiguille centrale (Inclinaison courante) ----
-    float rad = currentLeanAngle * PI / 180.0;
-    int xTop = cx + radius * sin(rad);
-    int yTop = cy - radius * cos(rad);
-    spr->drawWedgeLine(cx, cy, xTop, yTop, 2, 6, TFT_CYAN); 
+    // Droite
+    String rollRightStr = String((int)abs(maxLeanRight)) + "  " + String(gForceAtMaxLeanRight, 1) + "G";
+    spr->drawString(rollRightStr, draw_mrr, rollY + 14, 2);
 
-    // ---- 5. Indicateurs d'angle MAX (Rouges) ----
-    float radMaxL = maxLeanLeft * PI / 180.0;
-    spr->fillCircle(cx + radius * sin(radMaxL), cy - radius * cos(radMaxL), 5, TFT_RED);
+    // Valeur actuelle au dessus
+    spr->setTextDatum(BC_DATUM);
+    spr->setTextColor(TFT_WHITE);
+    spr->drawFloat(abs(currentRoll), 1, rollX, rollY - 3, 2);
+
+    // ==========================================
+    // BARRE DE PITCH (Verticale à droite)
+    // ==========================================
+    const int pitchH = 120;
+    const int pitchX = 210; 
+    const int pitchY = 140; // MODIFIÉ : Descendu à 140 (au lieu de 120) pour dégager le haut de l'écran
+    const float maxPitchScale = 90.0f;
+
+    spr->drawRect(pitchX, pitchY - (pitchH/2), 16, pitchH, TFT_DARKGREY);
+    spr->drawFastHLine(pitchX, pitchY, 16, TFT_WHITE); 
+
+    int py = pitchY - (currentPitch / maxPitchScale) * (pitchH/2);
+    py = constrain(py, pitchY - (pitchH/2), pitchY + (pitchH/2));
+    spr->fillRect(pitchX, py - 4, 16, 9, TFT_MAGENTA);
+
+    int mpd = pitchY - (maxPitchDown / maxPitchScale) * (pitchH/2);
+    int mpu = pitchY - (maxPitchUp / maxPitchScale) * (pitchH/2);
+    int draw_mpd = constrain(mpd, pitchY, pitchY + (pitchH/2));
+    int draw_mpu = constrain(mpu, pitchY - (pitchH/2), pitchY);
+
+    spr->drawFastHLine(pitchX - 4, draw_mpd, 24, TFT_ORANGE);
+    spr->drawFastHLine(pitchX - 4, draw_mpu, 24, TFT_YELLOW);
+
+    // Affichage "G Force | Angle" à gauche de la barre
+    spr->setTextDatum(MR_DATUM); 
     
-    float radMaxR = maxLeanRight * PI / 180.0;
-    spr->fillCircle(cx + radius * sin(radMaxR), cy - radius * cos(radMaxR), 5, TFT_RED);
-
-    // ---- 6. Affichage Textuel des Angles ----
-    // Angle Actuel
-    spr->setTextDatum(MC_DATUM); 
-    spr->setTextColor(TFT_WHITE, TFT_BLACK); // Fond noir explicite pour écraser le texte
-    spr->drawFloat(abs(currentLeanAngle), 1, cx, cy + 40, 4); 
+    // Plongée (Orange)
+    spr->setTextColor(TFT_ORANGE);
+    String pitchDownStr = String(gForceAtMaxPitchDown, 1) + "G  " + String((int)abs(maxPitchDown));
+    spr->drawString(pitchDownStr, pitchX - 8, draw_mpd, 2);
     
-    // Angle Max Gauche
+    // Cabrage (Jaune)
+    spr->setTextColor(TFT_YELLOW);
+    String pitchUpStr = String(gForceAtMaxPitchUp, 1) + "G  " + String((int)abs(maxPitchUp));
+    spr->drawString(pitchUpStr, pitchX - 8, draw_mpu, 2);
+
+    // Valeur actuelle de Pitch en direct au-dessus de la jauge (Totalement dégagée maintenant)
+    spr->setTextDatum(BC_DATUM);
+    spr->setTextColor(TFT_WHITE);
+    spr->drawFloat(abs(currentPitch), 1, pitchX + 8, pitchY - (pitchH/2) - 4, 2);
+
+    // ==========================================
+    // FORCE G (Centre Gauche)
+    // ==========================================
     spr->setTextDatum(ML_DATUM);
-    spr->setTextColor(TFT_RED, TFT_BLACK);
-    spr->drawFloat(abs(maxLeanLeft), 1, 10, cy + 70, 2);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("G-FORCE", 10, 95, 2);
     
-    // Angle Max Droite
-    spr->setTextDatum(MR_DATUM);
-    spr->drawFloat(abs(maxLeanRight), 1, 230, cy + 70, 2);
+    spr->setTextColor(TFT_GREEN);
+    spr->drawFloat(currentGForce, 2, 10, 120, 4);
+    
+    spr->setTextColor(TFT_RED);
+    spr->drawString("MAX: " + String(maxGForce, 2), 10, 145, 2);
 
-    // ---- 7. Vitesse Actuelle ----
+    // ==========================================
+    // VITESSE (Centre Bas)
+    // ==========================================
     spr->setTextDatum(MC_DATUM);
-    spr->setTextColor(TFT_YELLOW, TFT_BLACK);
-    spr->drawString(String((int)currentSpeed), cx, cy + 85, 4); 
-    spr->drawString("km/h", cx, cy + 110, 2);
+    spr->setTextColor(TFT_YELLOW);
+    spr->drawString(String((int)currentSpeed), 115, 200, 7); 
+    spr->setTextColor(TFT_DARKGREY);
+    spr->drawString("km/h", 115, 235, 2);
 }

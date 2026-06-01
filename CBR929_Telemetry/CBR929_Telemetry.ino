@@ -88,40 +88,68 @@ void core0Task(void * pvParameters) {
 }
 
 void core1Task(void * pvParameters) {
-  String serialBuffer = ""; // Buffer pour stocker la commande reçue
-  bool virtualButtonActive = false;
+  String serialBuffer = "";
+  
+  // Variables pour gérer l'état du bouton physique (Anti-rebond et durée)
+  bool wasPhysicallyPressed = false;
+  unsigned long physicalPressStartTime = 0;
+  bool longPressHandled = false;
 
   for(;;) {
-    // --- LECTURE NON-BLOQUANTE DU PORT SÉRIE ---
+    bool triggerShortPress = false;
+    
+    // --- 1. LECTURE NON-BLOQUANTE DU PORT SÉRIE ---
     while (Serial.available() > 0) {
       char c = Serial.read();
       if (c == '\n' || c == '\r') {
-        serialBuffer.trim(); // On nettoie les espaces
+        serialBuffer.trim();
         if (serialBuffer == "BTN1") {
-          virtualButtonActive = true;
-          Serial.println(F("[SIM] 🕹️ Commande 'BTN1' reçue ! Changement de page..."));
+          triggerShortPress = true;
+          Serial.println(F("[SIM] 🕹️ Commande 'BTN1' reçue -> Changement de page."));
+        } else if (serialBuffer == "BTN1_RESET_IMU") {
+          Serial.println(F("[SIM] 🛠️ Commande 'BTN1_RESET_IMU' reçue -> Calibration IMU."));
+          IMUManager::calibrateZero();
         }
-        serialBuffer = ""; // On vide le buffer pour la prochaine commande
+        serialBuffer = "";
       } else {
-        serialBuffer += c; // On accumule les caractères
+        serialBuffer += c;
       }
     }
 
-    // --- LECTURE DU BOUTON (PHYSIQUE OU VIRTUEL) ---
-    // Le bouton est considéré comme pressé si GPIO à l'état LOW -OU- si commande série reçue
-    bool buttonPressed = (digitalRead(PIN_BUTTON) == LOW) || virtualButtonActive;
+    // --- 2. GESTION DU BOUTON PHYSIQUE (Court vs Long 5s) ---
+    // Rappel : PIN_BUTTON est en INPUT_PULLUP, donc LOW quand il est pressé
+    bool isPhysicallyPressed = (digitalRead(PIN_BUTTON) == LOW);
 
-    // Mise à jour de l'écran
-    DisplayManager::update(buttonPressed);
-
-    // Reset du bouton virtuel après traitement
-    if (virtualButtonActive) {
-      virtualButtonActive = false;
+    if (isPhysicallyPressed && !wasPhysicallyPressed) {
+        // Front descendant : l'utilisateur vient d'appuyer sur le bouton
+        physicalPressStartTime = millis();
+        wasPhysicallyPressed = true;
+        longPressHandled = false;
+    } 
+    else if (isPhysicallyPressed && wasPhysicallyPressed) {
+        // Le bouton est maintenu enfoncé : on vérifie si le délai de 5s est atteint
+        if (!longPressHandled && (millis() - physicalPressStartTime >= 5000)) {
+            Serial.println(F("[SYSTEM] ⏱️ Appui long 5s détecté -> Calibration IMU (Sauvegarde NVS)..."));
+            IMUManager::calibrateZero();
+            longPressHandled = true; // Flag pour ne pas recalibrer en boucle si on garde appuyé 10s
+        }
+    } 
+    else if (!isPhysicallyPressed && wasPhysicallyPressed) {
+        // Front montant : l'utilisateur relâche le bouton
+        if (!longPressHandled) {
+            // S'il a relâché AVANT les 5 secondes, on le considère comme un appui court
+            triggerShortPress = true;
+        }
+        wasPhysicallyPressed = false; // Reset de l'état
     }
 
-    // Écriture SD
+    // --- 3. MISE À JOUR DE L'ÉCRAN ---
+    // Le paramètre de update() gère le changement de page
+    DisplayManager::update(triggerShortPress);
+
+    // --- 4. ÉCRITURE SD ---
     SDLogger::logData();
 
-    vTaskDelay(pdMS_TO_TICKS(50)); // Boucle à ~20Hz
+    vTaskDelay(pdMS_TO_TICKS(50)); // Boucle maintenue de manière stable à ~20Hz
   }
 }

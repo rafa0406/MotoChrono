@@ -25,9 +25,18 @@ private:
     static DisplayPage currentPage;
     static unsigned long lastButtonPressMs;
 
-    // Historique des inclinaisons pour la page Piste
+    // Historique Inclinaison (Roll)
     static float maxLeanLeft;
     static float maxLeanRight;
+    static float gForceAtMaxLeanLeft;  // G Force sur l'angle max gauche
+    static float gForceAtMaxLeanRight; // G Force sur l'angle max droit
+
+    // Historique Assiette (Pitch)
+    static float maxPitchUp;   // Cabrage / Accélération max
+    static float maxPitchDown; // Plongée / Gros freinage max
+    static float maxGForce;    // Force G
+    static float gForceAtMaxPitchUp;   // G Force au cabrage max
+    static float gForceAtMaxPitchDown; // G Force à la plongée max
 };
 
 #endif // DISPLAYMANAGER_H
