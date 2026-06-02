@@ -194,15 +194,15 @@ void DisplayManager::drawPagePiste() {
     spr->setTextDatum(TC_DATUM); 
     spr->setTextColor(TFT_CYAN); 
     
-    String rollLeftStr = String((int)abs(maxLeanLeft))+"°" + "  " + String(gForceAtMaxLeanLeft, 1) + "G";
+    String rollLeftStr = String((int)abs(maxLeanLeft))+"`" + " " + String(gForceAtMaxLeanLeft, 1) + "G";
     spr->drawString(rollLeftStr, draw_mrl, rollY + 18, 2); 
 
-    String rollRightStr = String((int)abs(maxLeanRight))+"°" + "  " + String(gForceAtMaxLeanRight, 1) + "G";
+    String rollRightStr = String((int)abs(maxLeanRight))+"`" + " " + String(gForceAtMaxLeanRight, 1) + "G";
     spr->drawString(rollRightStr, draw_mrr, rollY + 18, 2);
 
     spr->setTextDatum(BC_DATUM);
     spr->setTextColor(TFT_CYAN);
-    spr->drawString(String((int)abs(currentRoll)) + "°", rollX, rollY - 3, 2);
+    spr->drawString(String((int)abs(currentRoll)) + "`", rollX, rollY - 3, 2);
 
     // ==========================================
     // 3. BARRE DE PITCH (Verticale à droite)
@@ -230,16 +230,16 @@ void DisplayManager::drawPagePiste() {
     spr->setTextDatum(MR_DATUM); 
     
     spr->setTextColor(TFT_YELLOW);
-    String pitchDownStr = String(gForceAtMaxPitchDown, 1) + "G  " + String((int)abs(maxPitchDown))+"°";
+    String pitchDownStr = String(gForceAtMaxPitchDown, 1) + "G " + String((int)abs(maxPitchDown))+"`";
     spr->drawString(pitchDownStr, pitchX - 8, draw_mpd, 2);
     
     spr->setTextColor(TFT_YELLOW);
-    String pitchUpStr = String(gForceAtMaxPitchUp, 1) + "G  " + String((int)abs(maxPitchUp))+"°";
+    String pitchUpStr = String(gForceAtMaxPitchUp, 1) + "G " + String((int)abs(maxPitchUp))+"`";
     spr->drawString(pitchUpStr, pitchX - 8, draw_mpu, 2);
 
     spr->setTextDatum(BC_DATUM);
     spr->setTextColor(TFT_YELLOW);
-    spr->drawString(String((int)abs(currentPitch)) + "°", pitchX + 8, pitchY - (pitchH/2) - 4, 2);
+    spr->drawString(String((int)abs(currentPitch)) + "`", pitchX + 8, pitchY - (pitchH/2) - 4, 2);
 
     // ==========================================
     // 4. FORCE G (Centre Gauche)
@@ -251,7 +251,7 @@ void DisplayManager::drawPagePiste() {
     spr->setTextColor(TFT_GREEN);
     spr->drawFloat(currentGForce, 2, 10, 120, 4);
     
-    spr->setTextColor(TFT_RED);
+    spr->setTextColor(TFT_GREEN);
     spr->drawString("MAX: " + String(maxGForce, 2), 10, 145, 2);
 
     // ==========================================
