@@ -14,7 +14,7 @@
 
 // --- Interface Utilisateur ---
 #define PIN_BUTTON1        3   // IO3 : Bouton poussoir 1 (Page / Calib)
-#define PIN_BUTTON2       6   // IO6 : Bouton poussoir 2 (Start/Stop Rec)
+#define PIN_BUTTON2        6   // IO6 : Bouton poussoir 2 (Start/Stop Rec)
 
 // --- UART EXTERNE (GPS ATGM336H) ---
 #define PIN_GPS_TX        4   // IO4 : À connecter au RX du module GPS
