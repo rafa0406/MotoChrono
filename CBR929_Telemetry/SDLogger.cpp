@@ -3,6 +3,7 @@
 #include "GPSManager.h"
 #include "IMUManager.h"
 #include "FuelManager.h"
+#include "SettingsManager.h" // NOUVEAU : Inclusion du gestionnaire
 
 bool SDLogger::isInitialized = false;
 bool SDLogger::isRecording = false; // Initialisé à false
@@ -30,20 +31,16 @@ void SDLogger::init() {
 
     Serial.println(F("[SD] Carte SD détectée avec succès. Prêt à enregistrer."));
     isInitialized = true;
-    
-    // ATTENTION : On ne lance plus createNewFile() ici ! On attend l'appui sur BTN2.
 }
 
 void SDLogger::toggleRecording() {
     if (!isInitialized) return;
 
     if (isRecording) {
-        // On arrête l'enregistrement
         closeFile();
         isRecording = false;
         Serial.println(F("[SD] 🛑 Enregistrement ARRÊTÉ."));
     } else {
-        // On démarre l'enregistrement
         createNewFile();
         isRecording = true;
         Serial.println(F("[SD] 🔴 Enregistrement DÉMARRÉ !"));
@@ -78,10 +75,25 @@ void SDLogger::createNewFile() {
 }
 
 void SDLogger::logData() {
-    // Si on n'est pas en mode enregistrement, on annule immédiatement
+    // 1. Si on n'est pas en mode enregistrement ou SD absente, on annule.
     if (!isInitialized || !logFile || !isRecording) return;
 
-    logFile.print(millis());               logFile.print(F(","));
+    // 2. NOUVEAU : Filtre de vitesse minimale (On n'enregistre pas à l'arrêt)
+    if (GPSManager::getSpeedKmh() < SettingsManager::minSpeedLogging) {
+        return; 
+    }
+
+    // 3. NOUVEAU : Contrôle précis de la fréquence (Hz)
+    static unsigned long lastLogTime = 0;
+    unsigned long logInterval = 1000 / SettingsManager::logFrequencyHz; // Ex: 1000/20 = 50ms
+    
+    if (millis() - lastLogTime < logInterval) {
+        return; // On attend le prochain cycle
+    }
+    lastLogTime = millis();
+
+    // 4. Écriture des données
+    logFile.print(millis());                      logFile.print(F(","));
     logFile.print(GPSManager::getLatitude(), 6);  logFile.print(F(","));
     logFile.print(GPSManager::getLongitude(), 6); logFile.print(F(","));
     logFile.print(GPSManager::getSpeedKmh(), 1);  logFile.print(F(","));
@@ -93,7 +105,12 @@ void SDLogger::logData() {
     logFile.println(FuelManager::getRemainingLiters(), 2); 
 
     writeCounter++;
-    if (writeCounter % 20 == 0) logFile.flush();
+    
+    // 5. NOUVEAU : Flush intelligent (exactement 1 fois par seconde)
+    // Si on est à 20Hz, ça fait un flush tous les 20 passages. Si 10Hz, tous les 10 passages.
+    if (SettingsManager::logFrequencyHz > 0 && writeCounter % SettingsManager::logFrequencyHz == 0) {
+        logFile.flush();
+    }
 }
 
 void SDLogger::closeFile() {

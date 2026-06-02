@@ -4,22 +4,23 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <FS.h>
 #include <SD.h>
+#include "SettingsManager.h" // NOUVEAU : Inclusion du gestionnaire de paramètres
 
 class WebServerManager {
 public:
-    // Configure le point d'accès WiFi et démarre le serveur
     static void init();
-
-    // À appeler dans la boucle du Core 1 pour traiter les requêtes entrantes
     static void handleClient();
 
 private:
     static WebServer server;
-
-    // Routes (Endpoints) du serveur web
     static void handleRoot();
     static void handleDownload();
+    
+    // NOUVELLES METHODES : Gestion de la page de configuration
+    static void handleConfig();
+    static void handleSaveConfig();
 };
 
 #endif // WEBSERVER_MANAGER_H

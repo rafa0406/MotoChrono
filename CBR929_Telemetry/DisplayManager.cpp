@@ -4,6 +4,7 @@
 #include "GPSManager.h"
 #include "IMUManager.h" // Utilisé pour récupérer l'angle d'inclinaison
 #include "SDLogger.h" // utiliser pour récupérer le status d'enregistrement
+#include "SettingsManager.h"
 
 // Variables statiques globales
 TFT_eSPI tft = TFT_eSPI();
@@ -104,24 +105,72 @@ void DisplayManager::drawPageRoute() {
     spr->drawString(String((int)GPSManager::getSpeedKmh()), 120, 60, 7); 
     spr->drawString("km/h", 120, 100, 2);
 
+    // Ligne de séparation
     spr->drawFastHLine(0, 120, 240, TFT_DARKGREY);
 
     // ==========================================
-    // 3. ESSENCE (Bas)
+    // 3. ESSENCE : VALEUR ET JAUGE VERTICALE (Bas)
     // ==========================================
-    spr->setTextColor(TFT_WHITE);
-    spr->drawString("Réservoir", 125, 140, 2);
-
     float remaining = FuelManager::getRemainingLiters();
-    int color = (remaining > 5.0) ? TFT_GREEN : TFT_RED;
+    float tankCap = SettingsManager::tankCapacity;
+    if (tankCap <= 0) tankCap = 18.0; // Sécurité anti-division par zéro
     
+    // Calcul du pourcentage restant (entre 0.0 et 1.0)
+    float fuelPct = constrain(remaining / tankCap, 0.0f, 1.0f);
+    
+    // Détermination de la couleur du texte (Rouge si réserve)
+    bool inReserve = FuelManager::isReserve();
+    uint16_t textColor = inReserve ? TFT_RED : TFT_WHITE;
+
+    // --- Affichage Numérique (décalé à gauche) ---
+    spr->setTextDatum(MC_DATUM);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("ESSENCE", 90, 135, 2);
+
     spr->setTextDatum(MR_DATUM);
-    spr->setTextColor(color);
-    spr->drawFloat(remaining, 1, 160, 180, 6);
+    spr->setTextColor(textColor);
+    spr->drawFloat(remaining, 1, 130, 180, 6); // Valeur numérique
 
     spr->setTextDatum(ML_DATUM);
     spr->setTextColor(TFT_WHITE);
-    spr->drawString("L", 165, 185, 4);
+    spr->drawString("L", 135, 185, 4); // Unité
+
+    // --- Affichage Jauge Verticale Dégradée (à droite) ---
+    const int barX = 175;
+    const int barY = 135;
+    const int barW = 30; // Jauge assez large pour être vue avec les vibrations
+    const int barH = 90;
+
+    // Contour de la jauge
+    spr->drawRect(barX, barY, barW, barH, TFT_DARKGREY);
+    
+    // Fond vide de la jauge (noir)
+    spr->fillRect(barX + 1, barY + 1, barW - 2, barH - 2, TFT_BLACK);
+
+    // Calcul de la hauteur de remplissage
+    int fillH = fuelPct * (barH - 2);
+    int fillY = (barY + barH - 1) - fillH; // Point de départ en Y (de bas en haut)
+
+    // Tracé ligne par ligne pour créer le dégradé de couleur "Vert -> Jaune -> Rouge"
+    for (int y = fillY; y <= barY + barH - 2; y++) {
+        // Ratio de position de cette ligne par rapport à la jauge totale (0.0 = bas, 1.0 = haut)
+        float posPct = (float)((barY + barH - 2) - y) / (barH - 2);
+        
+        // Calcul RGB : Rouge max en bas, Vert max en haut. 
+        // Le *2 permet de saturer les canaux au milieu pour obtenir un vrai Jaune vif.
+        uint8_t r = constrain((1.0f - posPct) * 255 * 2, 0, 255); 
+        uint8_t g = constrain(posPct * 255 * 2, 0, 255);          
+        
+        uint16_t lineColor = tft.color565(r, g, 0); // Conversion en format TFT 16-bits
+        
+        spr->drawFastHLine(barX + 1, y, barW - 2, lineColor);
+    }
+    
+    // Petit indicateur de réserve (trait rouge horizontal à côté de la jauge)
+    float resPct = constrain(SettingsManager::reserveCapacity / tankCap, 0.0f, 1.0f);
+    int resY = (barY + barH - 1) - (resPct * (barH - 2));
+    spr->drawFastHLine(barX - 5, resY, 5, TFT_RED);
+    spr->drawFastHLine(barX + barW, resY, 5, TFT_RED);
 }
 
 void DisplayManager::drawPagePiste() {
