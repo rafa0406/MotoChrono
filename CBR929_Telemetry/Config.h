@@ -46,4 +46,9 @@
 #define LOG_FREQUENCY_HZ      10  // Fréquence d'écriture sur la SD (10 fois par seconde)
 #define MIN_SPEED_LOGGING     10  // Vitesse min (km/h) pour lancer le chrono et le log
 
+// --- Paramètres de secours GPS (Atelier / Garage) ---
+#define GPS_DEFAULT_LAT       43.913500  // Circuit d'Albi (exemple)
+#define GPS_DEFAULT_LNG       2.118000   // Circuit d'Albi (exemple)
+#define GPS_FAKE_SPEED_KMH    0.0f       // Vitesse à l'arrêt dans le garage
+
 #endif // CONFIG_H

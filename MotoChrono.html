@@ -320,7 +320,10 @@
                         redrawMap();
                         renderChart();
                     }, 100);
-                }
+                } else {
+					// Si le fichier ne contient que des coordonnées à 0 (Pas de fix GPS)
+					alert("⚠️ Fichier chargé avec succès, mais aucune donnée GPS valide (0.0) trouvée. Sortez la moto pour capter les satellites !");
+				}
             };
             reader.readAsText(file);
         }

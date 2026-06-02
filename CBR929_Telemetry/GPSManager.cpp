@@ -66,21 +66,21 @@ float GPSManager::getSpeedKmh() {
     if (gps.speed.isValid()) {
         return gps.speed.kmph();
     }
-    return 0.0f;
+    return GPS_FAKE_SPEED_KMH;
 }
 
 double GPSManager::getLatitude() {
     if (gps.location.isValid()) {
         return gps.location.lat();
     }
-    return 0.0;
+    return GPS_DEFAULT_LAT;
 }
 
 double GPSManager::getLongitude() {
     if (gps.location.isValid()) {
         return gps.location.lng();
     }
-    return 0.0;
+    return GPS_DEFAULT_LNG;
 }
 
 int GPSManager::getSatellites() {
