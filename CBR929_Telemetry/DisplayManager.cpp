@@ -10,7 +10,7 @@
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite* DisplayManager::spr = nullptr;
 
-DisplayPage DisplayManager::currentPage = PAGE_PISTE;
+DisplayPage DisplayManager::currentPage = PAGE_CALIBRATION;
 unsigned long DisplayManager::lastButtonPressMs = 0;
 
 // Variables pour l'inclinomètre
@@ -51,21 +51,27 @@ void DisplayManager::init() {
 void DisplayManager::update(bool isButtonPressed) {
     if (spr == nullptr) return;
 
-    // Gestion du bouton poussoir pour changer de page
-    if (isButtonPressed && (millis() - lastButtonPressMs > 300)) { // Anti-rebond basique
-        currentPage = (currentPage == PAGE_ROUTE) ? PAGE_PISTE : PAGE_ROUTE;
+    // Gestion du bouton poussoir pour changer de page (Cycle à 3 états)
+    if (isButtonPressed && (millis() - lastButtonPressMs > 300)) { 
+        if (currentPage == PAGE_ROUTE) currentPage = PAGE_PISTE;
+        else if (currentPage == PAGE_PISTE) currentPage = PAGE_CALIBRATION;
+        else currentPage = PAGE_ROUTE;
+        
         lastButtonPressMs = millis();
     }
 
-    spr->fillSprite(TFT_BLACK); // Nettoyage de la frame
+    spr->fillSprite(TFT_BLACK); 
 
+    // Routage de l'affichage
     if (currentPage == PAGE_ROUTE) {
         drawPageRoute();
     } else if (currentPage == PAGE_PISTE) {
         drawPagePiste();
+    } else if (currentPage == PAGE_CALIBRATION) {
+        drawPageCalibration();
     }
 
-    spr->pushSprite(0, 0); // Envoi du buffer à l'écran ST7789 sans flickering
+    spr->pushSprite(0, 0); 
 }
 
 void DisplayManager::showByeBye() {
@@ -311,4 +317,55 @@ void DisplayManager::drawPagePiste() {
     spr->drawString(String((int)currentSpeed), 100, 200, 7); 
     spr->setTextColor(TFT_DARKGREY);
     spr->drawString("km/h", 100, 235, 2);
+}
+
+void DisplayManager::drawPageCalibration() {
+    // ==========================================
+    // EN-TÊTE
+    // ==========================================
+    spr->setTextDatum(TC_DATUM);
+    spr->setTextColor(TFT_ORANGE);
+    spr->drawString("CALIBRATION INJ.", 120, 10, 4);
+    spr->drawFastHLine(0, 40, 240, TFT_DARKGREY);
+
+    // Récupération des données en temps réel
+    unsigned int pulses = FuelManager::getPulseCount();
+    unsigned long openTimeMicros = FuelManager::getTotalOpenTimeMicros();
+    float consumed = FuelManager::getConsumedLiters();
+    
+    // Conversion en millisecondes pour un affichage lisible
+    float openTimeMs = openTimeMicros / 1000.0f; 
+
+    // ==========================================
+    // DONNÉES INJECTEUR (PULSE WIDTH)
+    // ==========================================
+    spr->setTextDatum(ML_DATUM);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("Ouverture totale (ms) :", 10, 60, 2);
+    
+    spr->setTextColor(TFT_WHITE);
+    // Affichage du temps en gros pour le calibrage
+    spr->drawFloat(openTimeMs, 1, 10, 94, 6); 
+
+    spr->setTextColor(TFT_WHITE);
+    spr->drawString("Impulsions : " + String(pulses), 10, 125, 2);
+
+    // ==========================================
+    // CONSOMMATION THÉORIQUE
+    // ==========================================
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("Conso. calculee :", 10, 140, 2);
+    
+    spr->setTextColor(TFT_CYAN);
+    // On affiche 3 décimales pour la précision du test
+    spr->drawFloat(consumed, 3, 10, 175, 6); 
+    spr->drawString("L", 160, 180, 4);
+
+    // ==========================================
+    // INFO COEFFICIENT
+    // ==========================================
+    spr->drawFastHLine(0, 210, 240, TFT_DARKGREY);
+    spr->setTextDatum(MC_DATUM);
+    spr->setTextColor(TFT_YELLOW);
+    spr->drawString("Coeff: " + String(SettingsManager::injectorCoeff, 9), 120, 225, 2);
 }

@@ -17,6 +17,7 @@ public:
     static double gpsDefaultLat;
     static double gpsDefaultLng;
     static float gpsFakeSpeed;
+    static float injectorCoeff;
 
 private:
     static Preferences preferences;

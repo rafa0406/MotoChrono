@@ -10,13 +10,20 @@ public:
     static void resetFuel();
     static bool isReserve();
 
-    // Nécessaire pour les interruptions matérielles
+    // Getters pour la calibration
+    static unsigned int getPulseCount();
+    static unsigned long getTotalOpenTimeMicros(); // NOUVEAU : Temps total d'ouverture
+    static float getConsumedLiters();
+
     static void IRAM_ATTR onPulse();
     static void IRAM_ATTR onTimer();
 
 private:
-    static unsigned long lastPulseTime;
     static volatile unsigned int pulseCount;
+    static volatile unsigned long totalOpenTimeMicros; // Cumul du temps d'ouverture
+    static volatile unsigned long openStartMicros;     // Timestamp de l'ouverture
+    static volatile bool isInjectorOpen;               // État actuel de l'injecteur
+    
     static hw_timer_t * timer;
 };
 

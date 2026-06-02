@@ -6,7 +6,8 @@
 
 enum DisplayPage {
     PAGE_ROUTE,
-    PAGE_PISTE
+    PAGE_PISTE,
+    PAGE_CALIBRATION
 };
 
 class DisplayManager {
@@ -18,6 +19,7 @@ public:
 private:
     static void drawPageRoute();
     static void drawPagePiste();
+    static void drawPageCalibration();
 
     // Seul le Sprite (l'image lourde) reste dynamique !
     static TFT_eSprite* spr; 

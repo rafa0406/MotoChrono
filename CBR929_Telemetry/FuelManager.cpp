@@ -1,49 +1,86 @@
 #include "FuelManager.h"
 #include "Config.h"
-#include "SettingsManager.h" 
+#include "SettingsManager.h"
 
-// Déclaration des variables statiques
-unsigned long FuelManager::lastPulseTime = 0;
 volatile unsigned int FuelManager::pulseCount = 0;
+volatile unsigned long FuelManager::totalOpenTimeMicros = 0;
+volatile unsigned long FuelManager::openStartMicros = 0;
+volatile bool FuelManager::isInjectorOpen = false;
 hw_timer_t * FuelManager::timer = NULL;
 
 void IRAM_ATTR FuelManager::onPulse() {
-    pulseCount++;
+    unsigned long currentMicros = micros();
+    // L'optocoupleur tire la broche vers GND (LOW) quand l'injecteur s'ouvre
+    bool isPinLow = (digitalRead(PIN_INJECTOR) == LOW); 
+
+    if (isPinLow && !isInjectorOpen) {
+        // --- OUVERTURE DE L'INJECTEUR ---
+        openStartMicros = currentMicros;
+        isInjectorOpen = true;
+        pulseCount++; 
+    } 
+    else if (!isPinLow && isInjectorOpen) {
+        // --- FERMETURE DE L'INJECTEUR ---
+        // Le calcul "current - start" gère automatiquement le dépassement 
+        // de capacité (overflow) de micros() qui arrive toutes les ~70 minutes.
+        unsigned long duration = currentMicros - openStartMicros;
+        totalOpenTimeMicros += duration;
+        isInjectorOpen = false;
+    }
 }
 
 void IRAM_ATTR FuelManager::onTimer() {
-    // Logique de calcul de consommation (vide pour le moment)
+    // Logique de timer inchangée
 }
 
 void FuelManager::init() {
-    Serial.println(F("[FUEL] Initialisation du gestionnaire d'essence..."));
+    Serial.println(F("[FUEL] Initialisation du gestionnaire d'essence (Mode Pulse Width)..."));
     
     pinMode(PIN_INJECTOR, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PIN_INJECTOR), onPulse, FALLING);
+    
+    // IMPORTANT : On passe en CHANGE pour capter l'ouverture ET la fermeture
+    attachInterrupt(digitalPinToInterrupt(PIN_INJECTOR), onPulse, CHANGE);
 
-    // NOUVELLE API TIMER ESP32 (Core V3)
-    timer = timerBegin(1000000); // Fréquence de 1MHz
+    timer = timerBegin(1000000); 
     timerAttachInterrupt(timer, &onTimer);
-    timerAlarm(timer, 1000000, true, 0); // Déclenchement toutes les 1 sec, boucle infinie (0)
+    timerAlarm(timer, 1000000, true, 0); 
+}
+
+unsigned int FuelManager::getPulseCount() {
+    noInterrupts();
+    unsigned int currentPulses = pulseCount;
+    interrupts();
+    return currentPulses;
+}
+
+unsigned long FuelManager::getTotalOpenTimeMicros() {
+    // Désactiver les interruptions est critique ici pour ne pas lire 
+    // une variable 32-bits pendant que l'interruption la modifie.
+    noInterrupts();
+    unsigned long totalTime = totalOpenTimeMicros;
+    interrupts();
+    return totalTime;
+}
+
+float FuelManager::getConsumedLiters() {
+    // On utilise désormais la valeur dynamique configurée via la NVS
+    return (getTotalOpenTimeMicros() * SettingsManager::injectorCoeff);
 }
 
 float FuelManager::getRemainingLiters() {
-    // On calcule l'essence consommée selon les impulsions physiques
-    float consumed = (pulseCount * 0.00005); 
-    
-    // Le restant est calculé DYNAMIQUEMENT par rapport aux paramètres actuels
+    float consumed = getConsumedLiters(); 
     float remaining = SettingsManager::tankCapacity - consumed;
-    
     return (remaining > 0) ? remaining : 0;
 }
 
 void FuelManager::resetFuel() {
-    // Faire le plein revient simplement à remettre la consommation à zéro
+    noInterrupts();
     pulseCount = 0;
-    Serial.println(F("[FUEL] Plein fait ! Réinitialisation de la consommation à 0."));
+    totalOpenTimeMicros = 0; // Remise à zéro stricte des temps
+    interrupts();
+    Serial.println(F("[FUEL] Plein fait ! Réinitialisation de la consommation."));
 }
 
 bool FuelManager::isReserve() {
-    // isReserve utilisait déjà SettingsManager de façon dynamique, c'est parfait.
     return (getRemainingLiters() <= SettingsManager::reserveCapacity);
 }

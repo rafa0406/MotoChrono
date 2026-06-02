@@ -9,7 +9,8 @@ int SettingsManager::logFrequencyHz = 20;
 float SettingsManager::minSpeedLogging = 5.0;
 double SettingsManager::gpsDefaultLat = 43.913500;
 double SettingsManager::gpsDefaultLng = 2.118000;
-float SettingsManager::gpsFakeSpeed = 0.0;
+float SettingsManager::gpsFakeSpeed = 1.0;
+float SettingsManager::injectorCoeff = 0.000000012f;
 
 void SettingsManager::init() {
     // On ouvre l'espace "motochrono" en mode lecture/écriture (false)
@@ -22,7 +23,8 @@ void SettingsManager::init() {
     minSpeedLogging = preferences.getFloat("minSpd", 5.0);
     gpsDefaultLat = preferences.getDouble("gpsLat", 43.913500);
     gpsDefaultLng = preferences.getDouble("gpsLng", 2.118000);
-    gpsFakeSpeed = preferences.getFloat("gpsSpd", 0.0);
+    gpsFakeSpeed = preferences.getFloat("gpsSpd", 1.0);
+    injectorCoeff = preferences.getFloat("injCoeff", 0.000000012f);
 
     Serial.println(F("[SETTINGS] Paramètres chargés depuis le NVS au démarrage."));
 }
@@ -36,6 +38,7 @@ void SettingsManager::save() {
     preferences.putDouble("gpsLat", gpsDefaultLat);
     preferences.putDouble("gpsLng", gpsDefaultLng);
     preferences.putFloat("gpsSpd", gpsFakeSpeed);
+    preferences.putFloat("injCoeff", injectorCoeff);
 
     // 2. Log de ce que l'on vient de demander à écrire (Les variables en RAM)
     Serial.println(F("\n============================================="));
@@ -47,6 +50,7 @@ void SettingsManager::save() {
     Serial.printf(" - GPS Lat      : %.6f\n", gpsDefaultLat);
     Serial.printf(" - GPS Lng      : %.6f\n", gpsDefaultLng);
     Serial.printf(" - Vitesse Fake : %.1f km/h\n", gpsFakeSpeed);
+    Serial.printf(" - Coeff. Inj.  : %.9f\n", injectorCoeff);
 
     // 3. Re-lecture immédiate depuis la mémoire Flash (NVS)
     // On met des valeurs par défaut aberrantes (ex: -1.0) pour être sûr de capter une erreur de lecture
@@ -57,6 +61,7 @@ void SettingsManager::save() {
     double checkGpsLat = preferences.getDouble("gpsLat", -1.0);
     double checkGpsLng = preferences.getDouble("gpsLng", -1.0);
     float checkGpsSpd = preferences.getFloat("gpsSpd", -1.0);
+    float checkInjCoeff = preferences.getFloat("injCoeff", -1.0);
 
     // 4. Log de confirmation de la puce physique
     Serial.println(F("---------------------------------------------"));
@@ -68,5 +73,6 @@ void SettingsManager::save() {
     Serial.printf(" - GPS Lat      : %.6f\n", checkGpsLat);
     Serial.printf(" - GPS Lng      : %.6f\n", checkGpsLng);
     Serial.printf(" - Vitesse Fake : %.1f km/h\n", checkGpsSpd);
+    Serial.printf(" - Coeff. Inj   : %.9f\n", checkInjCoeff);
     Serial.println(F("=============================================\n"));
 }

@@ -173,6 +173,9 @@ void WebServerManager::handleConfig() {
     html += "<label>Vitesse factice GPS (km/h)</label>";
     html += "<input type='number' step='0.1' name='gpsSpd' value='" + String(SettingsManager::gpsFakeSpeed) + "'>";
 
+    html += "<label>Coeff. Injecteur (L/µs)</label>";
+    html += "<input type='number' step='any' name='injCoeff' value='" + String(SettingsManager::injectorCoeff, 9) + "'>";
+
     html += "<button type='submit' class='btn btn-save'>💾 Sauvegarder</button>";
     html += "</form>";
     
@@ -191,6 +194,7 @@ void WebServerManager::handleSaveConfig() {
     if (server.hasArg("gpsLat")) SettingsManager::gpsDefaultLat = server.arg("gpsLat").toDouble();
     if (server.hasArg("gpsLng")) SettingsManager::gpsDefaultLng = server.arg("gpsLng").toDouble();
     if (server.hasArg("gpsSpd")) SettingsManager::gpsFakeSpeed = server.arg("gpsSpd").toFloat();
+    if (server.hasArg("injCoeff")) SettingsManager::injectorCoeff = server.arg("injCoeff").toFloat();
 
     // Ordre d'écriture dans la mémoire flash (NVS)
     SettingsManager::save(); 
