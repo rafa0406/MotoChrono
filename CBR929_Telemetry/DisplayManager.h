@@ -8,7 +8,8 @@ enum DisplayPage {
     PAGE_ROUTE,
     PAGE_PISTE,
     PAGE_CALIBRATION,
-    PAGE_GPS
+    PAGE_GPS,
+    PAGE_VEILLE
 };
 
 class DisplayManager {
@@ -22,12 +23,18 @@ private:
     static void drawPagePiste();
     static void drawPageCalibration();
     static void drawPageGPS();
+    static void drawPageVeille();
 
     // Seul le Sprite (l'image lourde) reste dynamique !
     static TFT_eSprite* spr; 
 
     static DisplayPage currentPage;
+    static DisplayPage previousPage;
     static unsigned long lastButtonPressMs;
+    static unsigned long lastMotionTime;
+
+    // Historique Vitesse
+    static float maxSpeed;
 
     // Historique Inclinaison (Roll)
     static float maxLeanLeft;

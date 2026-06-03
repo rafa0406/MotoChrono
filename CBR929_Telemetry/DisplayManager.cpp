@@ -10,8 +10,13 @@
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite* DisplayManager::spr = nullptr;
 
-DisplayPage DisplayManager::currentPage = PAGE_GPS;
+DisplayPage DisplayManager::currentPage = PAGE_ROUTE;
+DisplayPage DisplayManager::previousPage = PAGE_ROUTE;
 unsigned long DisplayManager::lastButtonPressMs = 0;
+unsigned long DisplayManager::lastMotionTime = 0;
+
+// Init de la V-Max
+float DisplayManager::maxSpeed = 0.0f; //
 
 // Variables pour l'inclinomètre
 float DisplayManager::maxLeanLeft = 0.0f;
@@ -27,8 +32,8 @@ float DisplayManager::maxGForce = 0.0f;
 
 void DisplayManager::init() {
     Serial.println(F("[DISPLAY] 1. Activation du rétroéclairage..."));
-    pinMode(2, OUTPUT);
-    digitalWrite(2, HIGH); 
+    pinMode(PIN_BACKLIGHT, OUTPUT); // <-- Utilise la macro corrigée
+    digitalWrite(PIN_BACKLIGHT, HIGH); 
 
     Serial.println(F("[DISPLAY] 2. Init TFT Hardware..."));
     tft.init(); 
@@ -38,7 +43,6 @@ void DisplayManager::init() {
     Serial.println(F("[DISPLAY] 3. Allocation Sprite en PSRAM..."));
     spr = new TFT_eSprite(&tft); 
     
-    // Allocation du sprite (nécessite ~115ko de RAM/PSRAM)
     if (spr != nullptr && spr->createSprite(240, 240) != nullptr) {
         spr->setTextDatum(MC_DATUM); 
         spr->fillSprite(TFT_BLACK);
@@ -46,35 +50,81 @@ void DisplayManager::init() {
     } else {
         Serial.println(F("[DISPLAY] ERREUR ALLOCATION SPRITE !"));
     }
+    
+    lastMotionTime = millis(); // Initialisation du chronomètre d'immobilité
 }
 
 void DisplayManager::update(bool isButtonPressed) {
     if (spr == nullptr) return;
 
-    // Gestion du bouton poussoir (Cycle à 4 états : Route -> Piste -> Calibration -> GPS)
-    if (isButtonPressed && (millis() - lastButtonPressMs > 300)) { 
-        if (currentPage == PAGE_ROUTE) currentPage = PAGE_PISTE;
-        else if (currentPage == PAGE_PISTE) currentPage = PAGE_CALIBRATION;
-        else if (currentPage == PAGE_CALIBRATION) currentPage = PAGE_GPS;
-        else currentPage = PAGE_ROUTE;
+    float currentSpeed = GPSManager::getSpeedKmh();
+    unsigned long currentMillis = millis();
+
+    // ==========================================
+    // 1. REVEIL AUTOMATIQUE ET RESET TIMER
+    // ==========================================
+    // Si la vitesse dépasse le filtre antibruit GPS (ex: 2km/h), la moto roule
+    if (currentSpeed >= STANDBY_SPEED_THRESH) {
+        lastMotionTime = currentMillis; 
         
-        lastButtonPressMs = millis();
+        if (currentPage == PAGE_VEILLE) {
+            currentPage = previousPage; // On restaure la dernière vue (Route ou Piste)
+            digitalWrite(PIN_BACKLIGHT, HIGH); // Rallumage matériel de la dalle IPS
+            Serial.println(F("[DISPLAY] Réveil automatique : Mouvement détecté !"));
+        }
     }
 
-    spr->fillSprite(TFT_BLACK); 
-
-    // Routage de l'affichage
-    if (currentPage == PAGE_ROUTE) {
-        drawPageRoute();
-    } else if (currentPage == PAGE_PISTE) {
-        drawPagePiste();
-    } else if (currentPage == PAGE_CALIBRATION) {
-        drawPageCalibration();
-    } else if (currentPage == PAGE_GPS) {
-        drawPageGPS();
+    // ==========================================
+    // 2. PASSAGE EN VEILLE (Immobilité prolongée)
+    // ==========================================
+    if (currentPage != PAGE_VEILLE && (currentMillis - lastMotionTime > STANDBY_TIMEOUT_MS)) {
+        previousPage = currentPage; // Mémorise la page avant l'extinction
+        currentPage = PAGE_VEILLE;
+        digitalWrite(PIN_BACKLIGHT, LOW); // Extinction complète pour sauver l'énergie
+        Serial.println(F("[DISPLAY] Mise en veille : Immobilité de 60s."));
     }
 
-    spr->pushSprite(0, 0); 
+    // ==========================================
+    // 3. GESTION DU BOUTON (Réveil MANUEL / Pages)
+    // ==========================================
+    if (isButtonPressed && (currentMillis - lastButtonPressMs > 300)) { 
+        lastButtonPressMs = currentMillis;
+        lastMotionTime = currentMillis; // L'appui sur le bouton prouve qu'on est actif
+
+        if (currentPage == PAGE_VEILLE) {
+            // L'utilisateur réveille le tableau de bord à l'arrêt
+            currentPage = previousPage;
+            digitalWrite(PIN_BACKLIGHT, HIGH);
+            Serial.println(F("[DISPLAY] Réveil manuel via BTN1."));
+        } else {
+            // Cycle classique des pages si on n'était pas en veille
+            if (currentPage == PAGE_ROUTE) currentPage = PAGE_PISTE;
+            else if (currentPage == PAGE_PISTE) currentPage = PAGE_CALIBRATION;
+            else if (currentPage == PAGE_CALIBRATION) currentPage = PAGE_GPS;
+            else currentPage = PAGE_ROUTE;
+        }
+    }
+
+    // ==========================================
+    // 4. RENDU VISUEL (Uniquement si allumé)
+    // ==========================================
+    // Optimisation Dual Core : si l'écran est en veille, l'ESP32 ne fait aucun calcul d'affichage.
+    if (currentPage != PAGE_VEILLE) {
+        spr->fillSprite(TFT_BLACK); 
+
+        if (currentPage == PAGE_ROUTE) drawPageRoute();
+        else if (currentPage == PAGE_PISTE) drawPagePiste();
+        else if (currentPage == PAGE_CALIBRATION) drawPageCalibration();
+        else if (currentPage == PAGE_GPS) drawPageGPS();
+
+        spr->pushSprite(0, 0); 
+    }
+}
+
+void DisplayManager::drawPageVeille() {
+    // Cette fonction n'a rien de spécifique à faire puisque l'update évite 
+    // l'appel au pushSprite() en veille pour sauver du temps CPU.
+    // L'extinction matérielle de l'écran garantit un noir parfait et moins de conso.
 }
 
 void DisplayManager::showByeBye() {
@@ -87,6 +137,11 @@ void DisplayManager::showByeBye() {
 }
 
 void DisplayManager::drawPageRoute() {
+
+    // Récupération de la vitesse actuelle et maj de la V-Max
+    float currentSpeed = GPSManager::getSpeedKmh();
+    if (currentSpeed > maxSpeed) maxSpeed = currentSpeed;
+
     // ==========================================
     // 1. BARRE DE STATUT (Haut de l'écran)
     // ==========================================
@@ -111,8 +166,15 @@ void DisplayManager::drawPageRoute() {
     // ==========================================
     spr->setTextColor(TFT_WHITE);
     spr->setTextDatum(MC_DATUM);
-    spr->drawString(String((int)GPSManager::getSpeedKmh()), 120, 60, 7); 
-    spr->drawString("km/h", 120, 100, 2);
+    spr->drawString(String((int)currentSpeed), 80, 60, 7); 
+    spr->drawString("km/h", 80, 100, 2);
+
+    // Affichage V-Max Route (Aligné à droite juste au-dessus de la ligne grise)
+    spr->setTextDatum(MR_DATUM);
+    spr->setTextColor(TFT_YELLOW);
+    spr->drawString("Max Speed ", 210, 50, 2);
+    spr->drawString(String((int)maxSpeed), 200, 80, 4);
+    spr->drawString("km/h", 200, 100, 2);
 
     // Ligne de séparation
     spr->drawFastHLine(0, 120, 240, TFT_DARKGREY);
@@ -206,6 +268,8 @@ void DisplayManager::drawPagePiste() {
         gForceAtMaxPitchUp = currentGForce;
     }
     if (currentGForce > maxGForce) maxGForce = currentGForce;
+
+    if (currentSpeed > maxSpeed) maxSpeed = currentSpeed;
 
     // ==========================================
     // 1. BARRE DE STATUT (Haut de l'écran)
@@ -312,14 +376,20 @@ void DisplayManager::drawPagePiste() {
     spr->setTextColor(TFT_GREEN);
     spr->drawString("MAX: " + String(maxGForce, 2), 10, 145, 2);
 
-    // ==========================================
+// ==========================================
     // 5. VITESSE (Centre Bas)
     // ==========================================
     spr->setTextDatum(MC_DATUM);
     spr->setTextColor(TFT_YELLOW);
-    spr->drawString(String((int)currentSpeed), 100, 200, 7); 
+    spr->drawString(String((int)currentSpeed), 80, 200, 7); 
     spr->setTextColor(TFT_DARKGREY);
-    spr->drawString("km/h", 100, 235, 2);
+    spr->drawString("km/h", 80, 235, 2);
+
+    // Affichage V-Max Piste (Placé juste à droite de la vitesse centrale, sous la jauge de Pitch)
+    spr->setTextDatum(MC_DATUM);
+    spr->setTextColor(TFT_CYAN);
+    spr->drawString(String((int)maxSpeed), 180, 220, 4);
+    spr->drawString("Max km/h", 180, 235, 2);
 }
 
 void DisplayManager::drawPageCalibration() {

@@ -16,6 +16,9 @@
 #define PIN_BUTTON1        3   // IO3 : Bouton poussoir 1 (Page / Calib)
 #define PIN_BUTTON2        6   // IO6 : Bouton poussoir 2 (Start/Stop Rec)
 
+// --- Rétroéclairage Écran (Confirmé par schéma constructeur) ---
+#define PIN_BACKLIGHT     20  // IO20 : BL_PWM (Contrôle matériel du rétroéclairage)
+
 // --- UART EXTERNE (GPS ATGM336H) ---
 #define PIN_GPS_RX        10   // connecter au TX du module GPS
 #define PIN_GPS_TX        9    // connecter au RX du module GPS
@@ -45,7 +48,11 @@
 
 // --- Paramètres Télémétrie ---
 #define LOG_FREQUENCY_HZ      10  // Fréquence d'écriture sur la SD (10 fois par seconde)
-#define MIN_SPEED_LOGGING     10  // Vitesse min (km/h) pour lancer le chrono et le log
+#define MIN_SPEED_LOGGING     10  // Vitesse min (km/h) pour lancer le chrono et le log.
+
+// --- Paramètres d'Affichage (Veille) ---
+#define STANDBY_TIMEOUT_MS    60000 // 1 minute sans bouger = extinction écran
+#define STANDBY_SPEED_THRESH  2.0f  // Vitesse min pour considérer la moto en mouvement (filtre la dérive GPS)
 
 // --- Paramètres de secours GPS (Atelier / Garage) ---
 #define GPS_DEFAULT_LAT       43.913500  // Circuit d'Albi (exemple)
