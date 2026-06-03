@@ -12,12 +12,13 @@ public:
     static float getSpeedKmh();
     static double getLatitude();
     static double getLongitude();
-    static int getSatellites();
+    static int getSatellites();    
+    static uint32_t getCharsProcessed(); // Optionnel, pour ta page de Diagnostic (octets reçus)
 
 private:
     static HardwareSerial GPS_Serial;
     static TinyGPSPlus gps;
-    static void sendCASICCommand(const char* command);
+    static void sendCASICCommand(const char* command); // Méthode intelligente qui calcule le Checksum
 };
 
 #endif // GPS_MANAGER_H

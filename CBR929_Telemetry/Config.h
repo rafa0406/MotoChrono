@@ -17,9 +17,10 @@
 #define PIN_BUTTON2        6   // IO6 : Bouton poussoir 2 (Start/Stop Rec)
 
 // --- UART EXTERNE (GPS ATGM336H) ---
-#define PIN_GPS_TX        4   // IO4 : À connecter au RX du module GPS
-#define PIN_GPS_RX        5   // IO5 : À connecter au TX du module GPS
-#define GPS_BAUDRATE      9600 
+#define PIN_GPS_RX        4   // IO4 : À connecter au TX du module GPS
+#define PIN_GPS_TX        5   // IO5 : À connecter au RX du module GPS
+#define GPS_DEFAULT_BAUDRATE     9600 
+#define GPS_SETING_BAUDRATE      115200
 
 // --- SPI EXTERNE (Lecteur Carte MicroSD selon doc Waveshare) ---
 #define PIN_SPI_SCK       21  // SD_CLK

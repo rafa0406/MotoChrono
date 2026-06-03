@@ -10,7 +10,7 @@
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite* DisplayManager::spr = nullptr;
 
-DisplayPage DisplayManager::currentPage = PAGE_CALIBRATION;
+DisplayPage DisplayManager::currentPage = PAGE_GPS;
 unsigned long DisplayManager::lastButtonPressMs = 0;
 
 // Variables pour l'inclinomètre
@@ -51,10 +51,11 @@ void DisplayManager::init() {
 void DisplayManager::update(bool isButtonPressed) {
     if (spr == nullptr) return;
 
-    // Gestion du bouton poussoir pour changer de page (Cycle à 3 états)
+    // Gestion du bouton poussoir (Cycle à 4 états : Route -> Piste -> Calibration -> GPS)
     if (isButtonPressed && (millis() - lastButtonPressMs > 300)) { 
         if (currentPage == PAGE_ROUTE) currentPage = PAGE_PISTE;
         else if (currentPage == PAGE_PISTE) currentPage = PAGE_CALIBRATION;
+        else if (currentPage == PAGE_CALIBRATION) currentPage = PAGE_GPS;
         else currentPage = PAGE_ROUTE;
         
         lastButtonPressMs = millis();
@@ -69,6 +70,8 @@ void DisplayManager::update(bool isButtonPressed) {
         drawPagePiste();
     } else if (currentPage == PAGE_CALIBRATION) {
         drawPageCalibration();
+    } else if (currentPage == PAGE_GPS) {
+        drawPageGPS();
     }
 
     spr->pushSprite(0, 0); 
@@ -325,7 +328,7 @@ void DisplayManager::drawPageCalibration() {
     // ==========================================
     spr->setTextDatum(TC_DATUM);
     spr->setTextColor(TFT_ORANGE);
-    spr->drawString("CALIBRATION INJ.", 120, 10, 4);
+    spr->drawString("CALIBRATION  INJ.", 120, 10, 4);
     spr->drawFastHLine(0, 40, 240, TFT_DARKGREY);
 
     // Récupération des données en temps réel
@@ -368,4 +371,82 @@ void DisplayManager::drawPageCalibration() {
     spr->setTextDatum(MC_DATUM);
     spr->setTextColor(TFT_YELLOW);
     spr->drawString("Coeff: " + String(SettingsManager::injectorCoeff, 9), 120, 225, 2);
+}
+
+void DisplayManager::drawPageGPS() {
+
+    // ==========================================
+    // EN-TÊTE
+    // ==========================================
+    spr->setTextDatum(TC_DATUM);
+    spr->setTextColor(TFT_SKYBLUE);
+    spr->drawString("DIAGNOSTIC  GPS", 120, 10, 4);
+    spr->drawFastHLine(0, 40, 240, TFT_DARKGREY);
+
+    // Récupération des données GPS en temps réel
+    bool fixValid = GPSManager::isDataValid();
+    int satellites = GPSManager::getSatellites();
+    double lat = GPSManager::getLatitude();
+    double lng = GPSManager::getLongitude();
+
+    // ==========================================
+    // ÉTAT DU SIGNAL (FIX)
+    // ==========================================
+    spr->setTextDatum(ML_DATUM);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("Statut Fix :", 10, 65, 2);
+
+    spr->setTextDatum(MR_DATUM);
+    if (fixValid) {
+        spr->setTextColor(TFT_GREEN);
+        spr->drawString("FIX OK", 230, 65, 4);
+    } else {
+        // Clignotement visuel pour alerter de la recherche de signal
+        uint16_t searchColor = ((millis() / 500) % 2 == 0) ? TFT_ORANGE : TFT_DARKGREY;
+        spr->setTextColor(searchColor);
+        spr->drawString("RECHERCHE...", 230, 65, 2);
+    }
+
+    // ==========================================
+    // NOMBRE DE SATELLITES
+    // ==========================================
+    spr->setTextDatum(ML_DATUM);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("Satellites :", 10, 115, 2);
+
+    // Affichage du nombre en gros au centre droit
+    spr->setTextDatum(MR_DATUM);
+    // Code couleur pragmatique : Vert si >= 6 (bonne précision), Orange si < 6, Rouge si 0
+    uint16_t satColor = TFT_RED;
+    if (satellites >= 6) satColor = TFT_GREEN;
+    else if (satellites > 0) satColor = TFT_ORANGE;
+
+    spr->setTextColor(satColor);
+    spr->drawString(String(satellites), 195, 115, 6); 
+    
+    spr->setTextDatum(ML_DATUM);
+    spr->setTextColor(TFT_DARKGREY);
+    spr->drawString("Sats", 205, 120, 2);
+
+    // Ligne de séparation
+    spr->drawFastHLine(0, 155, 240, TFT_DARKGREY);
+
+    // ==========================================
+    // COORDONNÉES GÉOGRAPHIQUES
+    // ==========================================
+    spr->setTextDatum(ML_DATUM);
+    spr->setTextColor(TFT_LIGHTGREY);
+    spr->drawString("Position actuelle :", 10, 175, 2);
+
+    spr->setTextColor(TFT_WHITE);
+    // On affiche 6 décimales pour la précision géographique (indispensable sur piste)
+    spr->drawString("Lat: " + String(lat, 6), 15, 200, 2);
+    spr->drawString("Lng: " + String(lng, 6), 15, 220, 2);
+
+    // Petit indicateur de secours visuel si on utilise les valeurs Fake/Défaut du garage
+    if (lat == SettingsManager::gpsDefaultLat && lng == SettingsManager::gpsDefaultLng && !fixValid) {
+        spr->setTextDatum(MR_DATUM);
+        spr->setTextColor(TFT_YELLOW);
+        spr->drawString("SIMULÉ", 230, 210, 2);
+    }
 }
