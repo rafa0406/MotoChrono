@@ -89,9 +89,44 @@ uint32_t GPSManager::getCharsProcessed() {
 }
 
 float GPSManager::getSpeedKmh() {
-    if (gps.speed.isValid()) {
-        return gps.speed.kmph();
+    // SÉCURITÉ : On vérifie que la donnée est valide ET qu'elle est "fraîche"
+    // À 10Hz, une trame arrive toutes les 100ms. Si l'âge dépasse 250ms, on a un lag de réception.
+    if (gps.speed.isValid() && gps.speed.age() < 250) {
+        float rawSpeed = gps.speed.kmph();
+
+        // 1. ZONE MORTE (Anti-dérive dans les stands)
+        if (rawSpeed < 3.0f) {
+            return 0.0f;
+        }
+
+        static float smoothedSpeed = 0.0f;
+        float alpha = 1.0f; 
+
+        // 2. FILTRE ASYMÉTRIQUE
+        if (rawSpeed > smoothedSpeed) {
+            // PHASE D'ACCÉLÉRATION : La moto prend de la vitesse
+            // On applique un alpha élevé (0.7) pour que l'affichage suive la poignée de gaz instantanément.
+            alpha = 0.7f; 
+        } else {
+            // PHASE DE DÉCÉLÉRATION OU STABILISÉE
+            // On lisse la descente (0.3) pour que l'affichage soit plus lisible.
+            alpha = 0.3f;
+        }
+
+        // 3. BYPASS D'URGENCE (Anti-Lag absolu)
+        // Si l'écart dépasse 10 km/h d'un coup (gros freinage ou grosse accélération), 
+        // on coupe le lissage pour afficher la vitesse brute instantanément.
+        if (abs(rawSpeed - smoothedSpeed) > 10.0f) {
+            alpha = 1.0f; 
+        }
+
+        // Application mathématique
+        smoothedSpeed = (alpha * rawSpeed) + ((1.0f - alpha) * smoothedSpeed);
+        
+        return smoothedSpeed;
     }
+    
+    // Si pas de signal GPS ou signal trop vieux (perte satellite sous un pont)
     return SettingsManager::gpsFakeSpeed; 
 }
 
