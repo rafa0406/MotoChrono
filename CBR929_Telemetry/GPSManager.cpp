@@ -6,31 +6,58 @@ HardwareSerial GPSManager::GPS_Serial(1);
 TinyGPSPlus GPSManager::gps;
 
 void GPSManager::init() {
-    Serial.println(F("[GPS] Initialisation module ATGM336H..."));
+    Serial.println(F("========================================="));
+    Serial.println(F("[GPS] Lancement du Diagnostic UART..."));
     
-    // 1. On démarre à la vitesse d'usine du GPS (9600)
-    GPS_Serial.begin(GPS_DEFAULT_BAUDRATE, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
+    // 1. On démarre à la vitesse d'usine présumée (9600)
+    GPS_Serial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
     delay(500);
     
-    // 2. On demande au GPS de passer à 115200 bauds (CASIC 04)
+    // On force la commande de passage à 115200 (au cas où il est bien à 9600)
     sendCASICCommand("PCAS04,5"); 
     delay(100);
     
-    // 3. On redémarre physiquement le port UART de l'ESP32 à la nouvelle vitesse
+    // 2. On bascule l'ESP32 sur la vitesse cible (115200)
     GPS_Serial.end();
     delay(10);
-    GPS_Serial.begin(GPS_SETING_BAUDRATE, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
-    delay(100);
+    GPS_Serial.begin(115200, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
+    delay(500);
 
-    // 4. On configure la fréquence de rafraîchissement à 10Hz (100ms) (CASIC 02)
-    sendCASICCommand("PCAS02,100");
-    delay(100);
-
-    // 5. OPTIMISATION PISTE : On active UNIQUEMENT les trames GGA (index 1) et RMC (index 5).
-    // Format : GGA,GLL,GSA,GSV,RMC,VTG,ZDA,ANT,VDV,vel,clk
-    sendCASICCommand("PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0");
+    // ==========================================
+    // ETAPE DIAGNOSTIC : LE "SNIFFER" UART
+    // ==========================================
+    Serial.println(F("[GPS-DIAG] Ecoute brute de la broche RX (Pin 4) pendant 3 secondes..."));
+    Serial.println(F("--- DEBUT DE LA TRAME BRUTE ---"));
     
-    Serial.println(F("[GPS] Module configuré à 10Hz (115200 bauds, GGA+RMC uniquement)."));
+    unsigned long startTime = millis();
+    int bytesReceived = 0;
+    
+    while (millis() - startTime < 3000) {
+        if (GPS_Serial.available()) {
+            char c = GPS_Serial.read();
+            Serial.write(c); // On pousse directement le caractère vers le PC
+            bytesReceived++;
+        }
+    }
+    
+    Serial.println(F("\n--- FIN DE LA TRAME BRUTE ---"));
+    Serial.printf("[GPS-DIAG] Total des octets reçus : %d\n", bytesReceived);
+    
+    if (bytesReceived == 0) {
+        Serial.println(F("[ERREUR FATALE] 0 octet reçu. L'ESP32 est totalement aveugle."));
+        Serial.println(F(" -> Verifiez au multimètre la continuité du fil entre le TX du GPS et la Pin 4."));
+    } else if (bytesReceived > 0 && bytesReceived < 50) {
+        Serial.println(F("[ERREUR VITESSE] Quelques octets reçus (probablement des caractères bizarres)."));
+        Serial.println(F(" -> Le GPS n'est pas à 115200 bauds."));
+    } else {
+        Serial.println(F("[SUCCES] Communication matérielle validée !"));
+    }
+    Serial.println(F("=========================================\n"));
+
+    // 3. Configuration finale pour la piste
+    sendCASICCommand("PCAS02,100"); // 10 Hz
+    delay(100);
+    sendCASICCommand("PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0"); // GGA + RMC uniquement
 }
 
 void GPSManager::update() {

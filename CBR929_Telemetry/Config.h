@@ -19,12 +19,8 @@
 // --- UART EXTERNE (GPS ATGM336H) ---
 #define PIN_GPS_RX        4   // IO4 : À connecter au TX du module GPS
 #define PIN_GPS_TX        5   // IO5 : À connecter au RX du module GPS
-<<<<<<< HEAD
 #define GPS_DEFAULT_BAUDRATE     9600 
 #define GPS_SETING_BAUDRATE      115200
-=======
-#define GPS_BAUDRATE      9600 
->>>>>>> cd985e35f0a0b8aca1152e1a289e3b730544b774
 
 // --- SPI EXTERNE (Lecteur Carte MicroSD selon doc Waveshare) ---
 #define PIN_SPI_SCK       21  // SD_CLK
