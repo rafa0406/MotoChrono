@@ -7,62 +7,54 @@ TinyGPSPlus GPSManager::gps;
 
 void GPSManager::init() {
     Serial.println(F("========================================="));
-    Serial.println(F("[GPS] Lancement du Diagnostic UART..."));
+    Serial.println(F("[GPS] Initialisation module ATGM336H..."));
     
-    // 1. On démarre à la vitesse d'usine présumée (9600)
-    GPS_Serial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
-    delay(500);
+    // 1. PAUSE VITALE : L'ESP32 attend que le GPS ait fini de s'allumer
+    Serial.println(F("[GPS] Attente du boot du GPS (2.5 secondes)..."));
+    delay(2500); 
     
-    // On force la commande de passage à 115200 (au cas où il est bien à 9600)
-    sendCASICCommand("PCAS04,5"); 
+    // 2. Démarrage de l'ESP32 à la vitesse d'usine (9600)
+    GPS_Serial.begin(GPS_DEFAULT_BAUDRATE, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
     delay(100);
     
-    // 2. On bascule l'ESP32 sur la vitesse cible (115200)
+    // 3. Ordre de passage à 115200 (On tire avec les deux protocoles !)
+    sendCASICCommand("PCAS01,5");                 // LA VRAIE COMMANDE BAUDRATE ATGM
+    GPS_Serial.print("$PMTK251,115200*1F\r\n");   // Commande de secours pour clone Mediatek
+    delay(200);
+    
+    // 4. Bascule matérielle de l'ESP32 sur la nouvelle vitesse
     GPS_Serial.end();
-    delay(10);
-    GPS_Serial.begin(115200, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
-    delay(500);
-
-    // ==========================================
-    // ETAPE DIAGNOSTIC : LE "SNIFFER" UART
-    // ==========================================
-    Serial.println(F("[GPS-DIAG] Ecoute brute de la broche RX (Pin 4) pendant 3 secondes..."));
-    Serial.println(F("--- DEBUT DE LA TRAME BRUTE ---"));
-    
-    unsigned long startTime = millis();
-    int bytesReceived = 0;
-    
-    while (millis() - startTime < 3000) {
-        if (GPS_Serial.available()) {
-            char c = GPS_Serial.read();
-            Serial.write(c); // On pousse directement le caractère vers le PC
-            bytesReceived++;
-        }
-    }
-    
-    Serial.println(F("\n--- FIN DE LA TRAME BRUTE ---"));
-    Serial.printf("[GPS-DIAG] Total des octets reçus : %d\n", bytesReceived);
-    
-    if (bytesReceived == 0) {
-        Serial.println(F("[ERREUR FATALE] 0 octet reçu. L'ESP32 est totalement aveugle."));
-        Serial.println(F(" -> Verifiez au multimètre la continuité du fil entre le TX du GPS et la Pin 4."));
-    } else if (bytesReceived > 0 && bytesReceived < 50) {
-        Serial.println(F("[ERREUR VITESSE] Quelques octets reçus (probablement des caractères bizarres)."));
-        Serial.println(F(" -> Le GPS n'est pas à 115200 bauds."));
-    } else {
-        Serial.println(F("[SUCCES] Communication matérielle validée !"));
-    }
-    Serial.println(F("=========================================\n"));
-
-    // 3. Configuration finale pour la piste
-    sendCASICCommand("PCAS02,100"); // 10 Hz
     delay(100);
-    sendCASICCommand("PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0"); // GGA + RMC uniquement
+    GPS_Serial.begin(GPS_SETING_BAUDRATE, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
+    delay(500); // On laisse le port série se stabiliser
+
+    // 5. SÉCURITÉ : On renvoie les commandes à 115200
+    sendCASICCommand("PCAS01,5");
+    GPS_Serial.print("$PMTK251,115200*1F\r\n");
+    delay(200);
+
+    // 6. Configuration Piste (Fréquence 10 Hz)
+    sendCASICCommand("PCAS02,100"); 
+    delay(100);
+    
+    // BONUS : On force l'utilisation combinée des satellites GPS + BeiDou (Plus de précision !)
+    sendCASICCommand("PCAS04,3"); 
+    delay(100);
+
+    // 7. Optimisation : GGA + RMC uniquement
+    sendCASICCommand("PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0");
+    
+    Serial.println(F("[GPS] Module configuré et prêt pour la piste (10Hz, 115200 bauds)."));
+    Serial.println(F("========================================="));
 }
 
 void GPSManager::update() {
     while (GPS_Serial.available() > 0) {
-        gps.encode(GPS_Serial.read());
+        char c = GPS_Serial.read(); // On lit 1 caractère venant du GPS
+        
+        // Serial.print(c); // ECHO : On l'affiche sur l'écran du PC
+        
+        gps.encode(c);   // On le donne au décodeur pour la télémétrie
     }
 }
 
@@ -70,21 +62,21 @@ void GPSManager::update() {
 // == FONCTION D'ENVOI INTELLIGENTE        ==
 // ==========================================
 void GPSManager::sendCASICCommand(const char* command) {
-    // Calcul du XOR Checksum (standard NMEA)
+    // 1. Calcul du Checksum (XOR de tous les caractères de la commande)
     byte checksum = 0;
     for (int i = 0; command[i] != '\0'; i++) {
         checksum ^= command[i];
     }
     
-    // Construction et envoi de la trame ($ + Commande + * + Checksum + \r\n)
+    // 2. Construction de la trame valide : $ + commande + * + checksum + \r\n
     GPS_Serial.print("$");
     GPS_Serial.print(command);
     GPS_Serial.print("*");
     
-    // Si le checksum est < 16, on ajoute le 0 manquant pour formater sur 2 caractères (ex: 0F)
+    // Formatage du checksum sur 2 caractères hexa (ex: 0F au lieu de F)
     if (checksum < 0x10) GPS_Serial.print("0");
-    
     GPS_Serial.print(checksum, HEX);
+    
     GPS_Serial.print("\r\n"); 
 }
 
