@@ -13,8 +13,8 @@
 #define PIN_IGNITION      2   // IO2 : Entrée PC817_B (12V Après Contact)
 
 // --- Interface Utilisateur ---
-#define PIN_BUTTON1        3   // IO3 : Bouton poussoir 1 (Page / Calib)
-#define PIN_BUTTON2        6   // IO6 : Bouton poussoir 2 (Start/Stop Rec)
+#define PIN_BUTTON1        4   // IO4 : Bouton poussoir 1 (Page / Calib)
+#define PIN_BUTTON2        5   // IO5 : Bouton poussoir 2 (Start/Stop Rec)
 
 // --- Rétroéclairage Écran (Confirmé par schéma constructeur) ---
 #define PIN_BACKLIGHT     20  // IO20 : BL_PWM (Contrôle matériel du rétroéclairage)

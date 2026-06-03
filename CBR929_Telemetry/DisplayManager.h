@@ -7,6 +7,7 @@
 enum DisplayPage {
     PAGE_ROUTE,
     PAGE_PISTE,
+    PAGE_TROPHEES,
     PAGE_CALIBRATION,
     PAGE_GPS,
     PAGE_VEILLE
@@ -21,33 +22,47 @@ public:
 private:
     static void drawPageRoute();
     static void drawPagePiste();
+    static void drawPageTrophees(); 
     static void drawPageCalibration();
     static void drawPageGPS();
     static void drawPageVeille();
 
-    // Seul le Sprite (l'image lourde) reste dynamique !
     static TFT_eSprite* spr; 
 
     static DisplayPage currentPage;
     static DisplayPage previousPage;
+    
     static unsigned long lastButtonPressMs;
     static unsigned long lastMotionTime;
 
-    // Historique Vitesse
+    // --- TABLEAU DES RECORDS ET AFFICHAGE PISTE ---
     static float maxSpeed;
+    static float maxGForce;
 
     // Historique Inclinaison (Roll)
     static float maxLeanLeft;
     static float maxLeanRight;
-    static float gForceAtMaxLeanLeft;  // G Force sur l'angle max gauche
-    static float gForceAtMaxLeanRight; // G Force sur l'angle max droit
+    static float gForceAtMaxLeanLeft;  
+    static float gForceAtMaxLeanRight; 
 
     // Historique Assiette (Pitch)
-    static float maxPitchUp;   // Cabrage / Accélération max
-    static float maxPitchDown; // Plongée / Gros freinage max
-    static float maxGForce;    // Force G
-    static float gForceAtMaxPitchUp;   // G Force au cabrage max
-    static float gForceAtMaxPitchDown; // G Force à la plongée max
+    static float maxPitchUp;   
+    static float maxPitchDown; 
+    static float gForceAtMaxPitchUp;   
+    static float gForceAtMaxPitchDown; 
+    
+    // Nouveaux records calculés (Page Trophées)
+    static float maxBrakingG; // Freinage le plus violent
+    static float maxAccelG;   // Accélération la plus violente
+    static float best0to100;  // Meilleur temps 0-100 km/h (en secondes)
+
+    // Variables internes pour le calcul du 0-100 km/h
+    static unsigned long accelStartTime;
+    static bool isTracking0to100;
+
+    // Drapeaux de gestion de sauvegarde ---
+    static bool tropheesLoaded;
+    static bool tropheesChanged;
 };
 
 #endif // DISPLAYMANAGER_H

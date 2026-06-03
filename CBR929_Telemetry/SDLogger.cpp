@@ -3,7 +3,8 @@
 #include "GPSManager.h"
 #include "IMUManager.h"
 #include "FuelManager.h"
-#include "SettingsManager.h" // NOUVEAU : Inclusion du gestionnaire
+#include "SettingsManager.h"
+#include <ArduinoJson.h>
 
 bool SDLogger::isInitialized = false;
 bool SDLogger::isRecording = false; // Initialisé à false
@@ -120,4 +121,71 @@ void SDLogger::closeFile() {
         Serial.print(F("[SD] Fichier fermé proprement : "));
         Serial.println(currentFileName);
     }
+}
+
+// ==========================================
+// == GESTION DU FICHIER TROPHEES.JSON     ==
+// ==========================================
+
+void SDLogger::saveTrophees(float speed, float leanL, float leanR, float brakeG, float accelG, float maxG, float b0100) {
+    if (!isInitialized) return;
+
+    // Suppression de l'ancien fichier pour réécrire proprement par-dessus
+    if (SD.exists("/trophees.json")) {
+        SD.remove("/trophees.json");
+    }
+
+    File file = SD.open("/trophees.json", FILE_WRITE);
+    if (!file) {
+        Serial.println(F("[SD] ERREUR : Impossible d'écrire trophees.json"));
+        return;
+    }
+
+    // Création du document JSON (Syntaxe ArduinoJson v7)
+    JsonDocument doc; 
+    doc["maxSpeed"] = speed;
+    doc["maxLeanLeft"] = leanL;
+    doc["maxLeanRight"] = leanR;
+    doc["maxBrakingG"] = brakeG;
+    doc["maxAccelG"] = accelG;
+    doc["maxGForce"] = maxG;
+    doc["best0to100"] = b0100;
+
+    if (serializeJson(doc, file) == 0) {
+        Serial.println(F("[SD] ERREUR : Sérialisation JSON échouée."));
+    } else {
+        Serial.println(F("[SD] Trophées sauvegardés avec succès !"));
+    }
+    file.close();
+}
+
+bool SDLogger::loadTrophees(float &speed, float &leanL, float &leanR, float &brakeG, float &accelG, float &maxG, float &b0100) {
+    if (!isInitialized || !SD.exists("/trophees.json")) {
+        Serial.println(F("[SD] Fichier trophees.json introuvable. Nouveaux records vierges."));
+        return false;
+    }
+
+    File file = SD.open("/trophees.json", FILE_READ);
+    if (!file) return false;
+
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    file.close();
+
+    if (error) {
+        Serial.println(F("[SD] ERREUR : Lecture JSON corrompue."));
+        return false;
+    }
+
+    // Récupération avec valeurs par défaut si la clé n'existe pas
+    speed  = doc["maxSpeed"] | 0.0f;
+    leanL  = doc["maxLeanLeft"] | 0.0f;
+    leanR  = doc["maxLeanRight"] | 0.0f;
+    brakeG = doc["maxBrakingG"] | 0.0f;
+    accelG = doc["maxAccelG"] | 0.0f;
+    maxG   = doc["maxGForce"] | 0.0f;
+    b0100  = doc["best0to100"] | 99.99f;
+
+    Serial.println(F("[SD] Anciens Trophées chargés depuis la SD avec succès."));
+    return true;
 }
