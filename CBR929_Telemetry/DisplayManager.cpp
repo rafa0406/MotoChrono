@@ -5,6 +5,7 @@
 #include "IMUManager.h" 
 #include "SDLogger.h" 
 #include "SettingsManager.h"
+#include "WebServerManager.h"
 
 // Variables statiques globales
 TFT_eSPI tft = TFT_eSPI();
@@ -160,11 +161,12 @@ void DisplayManager::update(bool isButtonPressed) {
             digitalWrite(PIN_BACKLIGHT, HIGH);
             Serial.println(F("[DISPLAY] Réveil manuel via BTN1."));
         } else {
-            // Cycle mis à jour avec la page Trophées
+            // Cycle mis à jour avec la page WIFI
             if (currentPage == PAGE_ROUTE) currentPage = PAGE_PISTE;
             else if (currentPage == PAGE_PISTE) currentPage = PAGE_TROPHEES;
             else if (currentPage == PAGE_TROPHEES) currentPage = PAGE_CALIBRATION;
             else if (currentPage == PAGE_CALIBRATION) currentPage = PAGE_GPS;
+            else if (currentPage == PAGE_GPS) currentPage = PAGE_WIFI; // <-- AJOUT
             else currentPage = PAGE_ROUTE;
         }
     }
@@ -180,6 +182,7 @@ void DisplayManager::update(bool isButtonPressed) {
         else if (currentPage == PAGE_TROPHEES) drawPageTrophees();
         else if (currentPage == PAGE_CALIBRATION) drawPageCalibration();
         else if (currentPage == PAGE_GPS) drawPageGPS();
+        else if (currentPage == PAGE_WIFI) drawPageWIFI(); // <-- AJOUT
 
         spr->pushSprite(0, 0); 
     }
@@ -585,5 +588,41 @@ void DisplayManager::drawPageGPS() {
         spr->setTextDatum(MR_DATUM);
         spr->setTextColor(TFT_YELLOW);
         spr->drawString("SIMULÉ", 230, 210, 2);
+    }
+}
+
+void DisplayManager::drawPageWIFI() {
+    // ==========================================
+    // EN-TÊTE
+    // ==========================================
+    spr->setTextDatum(TC_DATUM);
+    spr->setTextColor(TFT_SKYBLUE);
+    spr->drawString("SERVEUR  WIFI", 120, 10, 4);
+    spr->drawFastHLine(0, 40, 240, TFT_DARKGREY);
+
+    spr->setTextDatum(MC_DATUM);
+    
+    if (WebServerManager::isWiFiActive()) {
+        spr->setTextColor(TFT_GREEN);
+        spr->drawString("STATUT : ACTIF", 120, 70, 4);
+        
+        spr->setTextColor(TFT_WHITE);
+        spr->drawString("SSID : "+String(WIFI_SSID), 120, 120, 2);
+        spr->drawString("MDP : "+String(WIFI_MDP), 120, 145, 2);
+        
+        spr->setTextColor(TFT_CYAN);
+        spr->drawString("URL : http://"+String(WIFI_IP_1)+"."+String(WIFI_IP_2)+"."+String(WIFI_IP_3)+"."+String(WIFI_IP_4)+".", 120, 175, 2);
+        
+        spr->setTextColor(TFT_ORANGE);
+        spr->drawString("Maintenir BTN1 5s pour Arreter", 120, 220, 2);
+    } else {
+        spr->setTextColor(TFT_DARKGREY);
+        spr->drawString("STATUT : INACTIF", 120, 90, 4);
+        
+        spr->setTextColor(TFT_GREEN);
+        spr->drawString("Eco energie", 120, 130, 4);
+        
+        spr->setTextColor(TFT_ORANGE);
+        spr->drawString("Maintenir BTN1 5s pour Activer", 120, 220, 2);
     }
 }

@@ -59,4 +59,19 @@
 #define GPS_DEFAULT_LNG       2.118000   // Circuit d'Albi (exemple)
 #define GPS_FAKE_SPEED_KMH    0.0f       // Vitesse à l'arrêt dans le garage
 
+// --- Wifi ---
+#define WIFI_SSID "MotoChrono"
+#define WIFI_MDP "piste929"
+
+#define WIFI_IP_1 10
+#define WIFI_IP_2 0
+#define WIFI_IP_3 0
+#define WIFI_IP_4 1
+
+#define WIFI_IP_MASK_1 255
+#define WIFI_IP_MASK_2 255
+#define WIFI_IP_MASK_3 255
+#define WIFI_IP_MASK_4 0
+
+
 #endif // CONFIG_H

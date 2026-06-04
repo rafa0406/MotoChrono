@@ -10,6 +10,7 @@ enum DisplayPage {
     PAGE_TROPHEES,
     PAGE_CALIBRATION,
     PAGE_GPS,
+    PAGE_WIFI,
     PAGE_VEILLE
 };
 
@@ -18,6 +19,7 @@ public:
     static void init();
     static void update(bool isButtonPressed);
     static void showByeBye();
+    static DisplayPage getCurrentPage() { return currentPage; }
 
 private:
     static void drawPageRoute();
@@ -25,6 +27,7 @@ private:
     static void drawPageTrophees(); 
     static void drawPageCalibration();
     static void drawPageGPS();
+    static void drawPageWIFI();
     static void drawPageVeille();
 
     static TFT_eSprite* spr; 

@@ -12,9 +12,13 @@ class WebServerManager {
 public:
     static void init();
     static void handleClient();
+    static void toggleWiFi();
+    static bool isWiFiActive();
 
 private:
     static WebServer server;
+    static bool wifiActive;
+    
     static void handleRoot();
     static void handleDownload();
     

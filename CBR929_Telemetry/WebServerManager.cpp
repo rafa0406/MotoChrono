@@ -1,39 +1,64 @@
 #include "WebServerManager.h"
 #include <vector>
-#include <algorithm> // Nécessaire pour std::sort
+#include <algorithm> 
+#include "Config.h"
 
-// Petite structure légère pour stocker les infos des fichiers avant le tri
+// Instanciation du serveur et de la variable d'état
+WebServer WebServerManager::server(80);
+bool WebServerManager::wifiActive = false; // <-- Radio OFF par défaut
+
 struct CsvFile {
     String name;
     size_t size;
 };
 
-// Instanciation du serveur sur le port HTTP standard (80)
-WebServer WebServerManager::server(80);
-
 void WebServerManager::init() {
-    Serial.println(F("[WIFI] Démarrage du point d'accès MotoChrono..."));
+    Serial.println(F("[WIFI] Préparation du serveur (Radio OFF par défaut - Eco Energie)"));
     
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP("MotoChrono_CBR929", "piste929"); 
+    // On coupe la radio au boot
+    WiFi.mode(WIFI_OFF);
 
-    Serial.print(F("[WIFI] Point d'accès créé. IP : "));
-    Serial.println(WiFi.softAPIP()); 
-
-    // Définition des routes
+    // Définition des routes (Fait une seule fois)
     server.on("/", HTTP_GET, handleRoot);
     server.on("/download", HTTP_GET, handleDownload);
-    
-    // NOUVELLES ROUTES : Configuration
     server.on("/config", HTTP_GET, handleConfig);
     server.on("/save_config", HTTP_POST, handleSaveConfig);
+}
 
-    server.begin();
-    Serial.println(F("[WIFI] Serveur Web HTTP démarré !"));
+void WebServerManager::toggleWiFi() {
+    wifiActive = !wifiActive;
+
+    if (wifiActive) {
+        Serial.println(F("[WIFI] Démarrage du point d'accès MotoChrono..."));
+        
+        // --- NOUVEAU : Forcer une IP personnalisée (ex: 10.0.0.1) ---
+        IPAddress local_IP(WIFI_IP_1, WIFI_IP_2, WIFI_IP_3, WIFI_IP_4);     // L'adresse IP de ton ESP32
+        IPAddress gateway(WIFI_IP_1, WIFI_IP_2, WIFI_IP_3, WIFI_IP_4);      // La passerelle (souvent identique à l'IP en mode AP)
+        IPAddress subnet(WIFI_IP_MASK_1, WIFI_IP_MASK_2, WIFI_IP_MASK_3, WIFI_IP_MASK_4);  // Le masque de sous-réseau standard
+        
+        WiFi.mode(WIFI_AP);
+        WiFi.softAPConfig(local_IP, gateway, subnet); // <-- Application de la config IP
+        WiFi.softAP(String(WIFI_SSID), String(WIFI_MDP)); 
+        
+        server.begin();
+        Serial.print(F("[WIFI] Point d'accès créé. IP : "));
+        Serial.println(WiFi.softAPIP()); 
+    } else {
+        Serial.println(F("[WIFI] Arrêt du point d'accès..."));
+        server.stop();
+        WiFi.softAPdisconnect(true);
+        WiFi.mode(WIFI_OFF);
+    }
+}
+
+bool WebServerManager::isWiFiActive() {
+    return wifiActive;
 }
 
 void WebServerManager::handleClient() {
-    server.handleClient(); 
+    if (wifiActive) {
+        server.handleClient(); // Ne traite les requêtes que si la radio est ON
+    }
 }
 
 void WebServerManager::handleRoot() {

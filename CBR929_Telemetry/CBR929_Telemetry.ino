@@ -93,85 +93,89 @@ void core0Task(void * pvParameters) {
 void core1Task(void * pvParameters) {
   String serialBuffer = "";
   
-  // Variables Bouton 1 (Page / Calib)
-  // On lit l'état réel au boot pour éviter un faux déclenchement si la broche flotte
+  // Variables Bouton 1 (Page / Calib / WiFi)
   bool wasBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
   unsigned long btn1PressStartTime = 0;
   bool btn1LongPressHandled = false;
 
   // Variables Bouton 2 (Start / Stop REC)
-  // On lit l'état réel au boot pour éviter que l'enregistrement ne démarre tout seul
   bool wasBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
 
   for(;;) {
     bool triggerShortPress = false;
     
-    // --- 1. LECTURE NON-BLOQUANTE DU PORT SÉRIE ---
+    // --- 1. LECTURE DU PORT SÉRIE (SIMULATION) ---
     while (Serial.available() > 0) {
       char c = Serial.read();
       if (c == '\n' || c == '\r') {
         serialBuffer.trim();
+        DisplayPage currentPg = DisplayManager::getCurrentPage();
+
         if (serialBuffer == "BTN1") {
           triggerShortPress = true;
-          Serial.println(F("[SIM] 🕹️ 'BTN1' reçu -> Changement de page."));
         } else if (serialBuffer == "BTN1_RESET_IMU") {
-          Serial.println(F("[SIM] 🛠️ 'BTN1_RESET_IMU' reçu -> Calibration IMU."));
-          IMUManager::calibrateZero();
+          if (currentPg == PAGE_PISTE) IMUManager::calibrateZero();
         } else if (serialBuffer == "BTN2") {
-          Serial.println(F("[SIM] 🕹️ 'BTN2' reçu -> Start/Stop Enregistrement."));
-          SDLogger::toggleRecording();
+          if (currentPg == PAGE_ROUTE || currentPg == PAGE_PISTE) SDLogger::toggleRecording();
         }
         serialBuffer = "";
       } else {
-        serialBuffer += c; // On accumule les caractères
+        serialBuffer += c;
       }
     }
 
-    // --- 2. GESTION DU BOUTON 1 (Court vs Long 5s) ---
+    // --- 2. GESTION DU BOUTON 1 (Court vs Long 5s contextuel) ---
     bool isBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
-    
     if (isBtn1Pressed && !wasBtn1Pressed) {
-        // Front descendant : l'utilisateur vient d'appuyer
         btn1PressStartTime = millis();
         wasBtn1Pressed = true;
         btn1LongPressHandled = false;
     } else if (isBtn1Pressed && wasBtn1Pressed) {
-        // Bouton maintenu : on vérifie les 5 secondes
         if (!btn1LongPressHandled && (millis() - btn1PressStartTime >= 5000)) {
-            Serial.println(F("[SYSTEM] ⏱️ Calibration IMU (Sauvegarde NVS)..."));
-            IMUManager::calibrateZero();
-            btn1LongPressHandled = true; // On bloque pour ne pas recalibrer en boucle
+            DisplayPage currentPg = DisplayManager::getCurrentPage();
+            
+            // ACTION CONTEXTUELLE AU BOUT DE 5 SECONDES
+            if (currentPg == PAGE_PISTE) {
+                Serial.println(F("[SYSTEM] ⏱️ Calibration IMU..."));
+                IMUManager::calibrateZero();
+            } else if (currentPg == PAGE_WIFI) {
+                Serial.println(F("[SYSTEM] ⏱️ Bascule WiFi..."));
+                WebServerManager::toggleWiFi();
+            }
+            
+            btn1LongPressHandled = true; 
         }
     } else if (!isBtn1Pressed && wasBtn1Pressed) {
-        // Front montant : l'utilisateur relâche
         if (!btn1LongPressHandled) {
-            triggerShortPress = true; // Si pas de long press, c'est un changement de page
+            triggerShortPress = true; // Clic court = Page Suivante
         }
-        wasBtn1Pressed = false; 
+        wasBtn1Pressed = false;
     }
 
-    // --- 3. GESTION DU BOUTON 2 (Start / Stop REC) ---
+    // --- 3. GESTION DU BOUTON 2 (Start / Stop REC contextuel) ---
     bool isBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
-    
     if (isBtn2Pressed && !wasBtn2Pressed) {
-        // Front descendant uniquement : on bascule l'état d'enregistrement
-        SDLogger::toggleRecording();
+        DisplayPage currentPg = DisplayManager::getCurrentPage();
+        
+        // REC autorisé uniquement sur Route ou Piste
+        if (currentPg == PAGE_ROUTE || currentPg == PAGE_PISTE) {
+            SDLogger::toggleRecording();
+        } else {
+            Serial.println(F("[SYSTEM] 🕹️ Bouton 2 ignoré sur cette page."));
+        }
     }
-    wasBtn2Pressed = isBtn2Pressed; // Sauvegarde de l'état pour le prochain cycle
+    wasBtn2Pressed = isBtn2Pressed;
 
     // --- 4. MISE À JOUR DE L'ÉCRAN ---
-    // Le paramètre gère le changement de page si triggerShortPress est true
     DisplayManager::update(triggerShortPress);
 
     // --- 5. ÉCRITURE SD ---
-    // La fonction contient déjà sa propre sécurité (isRecordingStatus)
     SDLogger::logData();
 
     // --- 6. GESTION DU SERVEUR WEB ---
-    // Traitement des requêtes WiFi (Téléchargement des CSV/HTML)
-    WebServerManager::handleClient(); 
+    WebServerManager::handleClient();
 
-    // --- 7. PAUSE DE L'OS (Crucial pour le Dual Core) ---
-    vTaskDelay(pdMS_TO_TICKS(50)); // Maintient la boucle à ~20Hz
+    // --- 7. PAUSE DE L'OS ---
+    vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
