@@ -4,9 +4,10 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <DNSServer.h>
 #include <FS.h>
 #include <SD.h>
-#include "SettingsManager.h" // NOUVEAU : Inclusion du gestionnaire de paramètres
+#include "SettingsManager.h" // Inclusion du gestionnaire de paramètres
 
 class WebServerManager {
 public:
@@ -17,14 +18,21 @@ public:
 
 private:
     static WebServer server;
+    static DNSServer dnsServer;
     static bool wifiActive;
-    
+    static File fsUploadFile;
+
     static void handleRoot();
     static void handleDownload();
     
-    // NOUVELLES METHODES : Gestion de la page de configuration
+    // Gestion de la page de configuration
     static void handleConfig();
     static void handleSaveConfig();
+
+    // HANDLERS FILE MANAGER
+    static void handleDelete();
+    static void handleUploadComplete();
+    static void handleFileUpload();
 };
 
 #endif // WEBSERVER_MANAGER_H

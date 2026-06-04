@@ -62,6 +62,7 @@
 // --- Wifi ---
 #define WIFI_SSID "MotoChrono"
 #define WIFI_MDP "piste929"
+#define WIFI_ALIAS_IP "motochrono"
 
 #define WIFI_IP_1 10
 #define WIFI_IP_2 0

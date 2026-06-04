@@ -611,7 +611,7 @@ void DisplayManager::drawPageWIFI() {
         spr->drawString("MDP : "+String(WIFI_MDP), 120, 145, 2);
         
         spr->setTextColor(TFT_CYAN);
-        spr->drawString("URL : http://"+String(WIFI_IP_1)+"."+String(WIFI_IP_2)+"."+String(WIFI_IP_3)+"."+String(WIFI_IP_4)+".", 120, 175, 2);
+        spr->drawString("URL : http://"+String(WIFI_ALIAS_IP)+".", 120, 175, 2);
         
         spr->setTextColor(TFT_ORANGE);
         spr->drawString("Maintenir BTN1 5s pour Arreter", 120, 220, 2);
