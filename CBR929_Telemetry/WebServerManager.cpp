@@ -7,6 +7,7 @@
 WebServer WebServerManager::server(80);
 DNSServer WebServerManager::dnsServer;
 bool WebServerManager::wifiActive = false; // <-- Radio OFF par défaut
+File WebServerManager::fsUploadFile;
 
 struct CsvFile {
     String name;
@@ -75,7 +76,6 @@ void WebServerManager::handleRoot() {
     html += "<style>body{font-family:sans-serif; background:#0f172a; color:white; padding:20px;} ";
     html += "a{display:block; padding:15px; margin:10px 0; text-align:center; font-weight:bold; color:white; text-decoration:none; border-radius:8px;} ";
     html += ".btn-app{background:#0284c7; box-shadow:0 4px 6px rgba(2,132,199,0.3);} "; 
-    html += ".btn-apk{background:#16a34a; box-shadow:0 4px 6px rgba(22,163,74,0.3);} ";
     html += ".btn-config{background:#f59e0b; box-shadow:0 4px 6px rgba(245,158,11,0.3);} "; 
     
     // --- NOUVEAUX STYLES FILE MANAGER ---
@@ -96,7 +96,7 @@ void WebServerManager::handleRoot() {
     // --- 1. UPLOAD DE FICHIERS (NOUVEAU) ---
     html += "<div class='upload-box'>";
     html += "<h3 style='margin-top:0; color:#38bdf8;'>📤 Mettre à jour l'App</h3>";
-    html += "<p style='font-size:12px; color:#94a3b8; margin-bottom:15px;'>Envoyez une nouvelle version de MotoChrono.html ou .apk sur la SD.</p>";
+    html += "<p style='font-size:12px; color:#94a3b8; margin-bottom:15px;'>Envoyez une nouvelle version de MotoChrono.html sur la SD.</p>";
     html += "<form method='POST' action='/upload' enctype='multipart/form-data'>";
     html += "<input type='file' name='f' style='margin-bottom:10px; color:#94a3b8; width:100%;'><br>";
     html += "<input type='submit' value='Envoyer le fichier' class='btn-app' style='width:100%; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px;'>";
@@ -109,16 +109,14 @@ void WebServerManager::handleRoot() {
         return;
     }
 
-    // --- 2. BOUTONS D'APPLICATIONS (APK et HTML) ---
-    bool hasApk = SD.exists("/MotoChrono.apk");
+    // --- 2. BOUTONS D'APPLICATIONS (HTML) ---
     bool hasHtml = SD.exists("/MotoChrono.html");
 
-    if (hasApk || hasHtml) {
+    if (hasHtml) {
         html += "<div style='background:#1e293b; padding:15px; border-radius:8px; margin-bottom:25px; border:1px solid #334155;'>";
         html += "<h3 style='margin-top:0; color:#38bdf8;'>📱 Application d'Analyse</h3>";
         html += "<p style='font-size:12px; color:#94a3b8; margin-bottom:15px;'>Téléchargez l'interface pour visualiser vos tracés hors-ligne.</p>";
         
-        if (hasApk) html += "<a href='/download?file=/MotoChrono.apk' class='btn-apk'>🤖 Installer l'App (Android APK)</a>";
         if (hasHtml) html += "<a href='/download?file=/MotoChrono.html' class='btn-app'>💻 Télécharger l'App (HTML)</a>";
         
         html += "</div>";
@@ -171,14 +169,20 @@ void WebServerManager::handleDownload() {
                 String contentType = "text/plain";
                 if (fileName.endsWith(".csv")) contentType = "text/csv";
                 else if (fileName.endsWith(".html")) contentType = "text/html";
-                else if (fileName.endsWith(".apk")) contentType = "application/vnd.android.package-archive"; 
 
                 String cleanName = fileName;
                 if (cleanName.startsWith("/")) {
                     cleanName = cleanName.substring(1); 
                 }
 
+                // --- 1. NOUVEAU : Transmission de la taille exacte au navigateur ---
+                // C'est cette ligne qui active la barre de progression sur ton téléphone !
+                server.sendHeader("Content-Length", String(downloadFile.size()));
+
+                // --- 2. Forcer le téléchargement avec le bon nom ---
                 server.sendHeader("Content-Disposition", "attachment; filename=\"" + cleanName + "\"");
+                
+                // --- 3. Streaming des données ---
                 server.streamFile(downloadFile, contentType);
                 downloadFile.close();
                 return;
