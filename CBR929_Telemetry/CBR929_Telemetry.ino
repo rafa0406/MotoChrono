@@ -63,10 +63,21 @@ void core0Task(void * pvParameters) {
 // == TÂCHE CORE 1 : UI & CARTE SD        ===
 // ==========================================
 void core1Task(void * pvParameters) {
+  bool wasBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
   bool wasBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
 
   for(;;) {
-    // --- GESTION DU BOUTON 2 (REC Manuel temporaire) ---
+    // --- GESTION DU BOUTON 1 (Changement de page) ---
+    bool isBtn1Pressed = (digitalRead(PIN_BUTTON1) == LOW);
+    bool triggerPageChange = false;
+    
+    // Front descendant (On ne déclenche qu'au moment précis de l'appui)
+    if (isBtn1Pressed && !wasBtn1Pressed) {
+        triggerPageChange = true;
+    }
+    wasBtn1Pressed = isBtn1Pressed;
+
+    // --- GESTION DU BOUTON 2 (Start/Stop REC SD) ---
     bool isBtn2Pressed = (digitalRead(PIN_BUTTON2) == LOW);
     if (isBtn2Pressed && !wasBtn2Pressed) {
         SDLogger::toggleRecording();
@@ -74,7 +85,8 @@ void core1Task(void * pvParameters) {
     wasBtn2Pressed = isBtn2Pressed;
 
     // --- LE MOTEUR GRAPHIQUE LVGL ---
-    DisplayManager::update(); // Gère les animations, les jauges et le rafraîchissement
+    // On passe l'ordre de changement de page au DisplayManager
+    DisplayManager::update(triggerPageChange); 
     
     // --- GESTION SD & WEBSERVER ---
     SDLogger::logData();

@@ -1,7 +1,12 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[MotoChrono.eez-project]:/userPages/0",
-    "subnavigationSelectedItems": {}
+    "selectedUserPageObject": "[MotoChrono.eez-project]:/userPages/1",
+    "selectedUserWidgetObject": "[MotoChrono.eez-project]:/userWidgets/0",
+    "selectedGlobalVariableObject": "[MotoChrono.eez-project]:/variables/globalVariables/13",
+    "selectedStyleObject": "[MotoChrono.eez-project]:/lvglStyles/styles/0",
+    "subnavigationSelectedItems": {
+      "variables-tab/sub-navigation/selected-item": "Global"
+    }
   },
   "layoutModel": {
     "rootEditor": {
@@ -21,6 +26,7 @@
           },
           {
             "type": "border",
+            "selected": 0,
             "size": 240,
             "location": "right",
             "children": [
@@ -186,17 +192,41 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 65,
+              "weight": 52.98447383553766,
+              "selected": 2,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#9cc92166-ce3c-4758-990e-e8b2142748ba",
-                  "name": "Main",
+                  "id": "#75b3342d-fbc2-4ecc-b177-b255abf95a6d",
+                  "name": "Settings",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[MotoChrono.eez-project]:/userPages/0",
+                    "objectPath": "[MotoChrono.eez-project]:/settings",
+                    "subObjectPath": "[MotoChrono.eez-project]:/settings",
+                    "permanent": false
+                  },
+                  "icon": "material:settings"
+                },
+                {
+                  "type": "tab",
+                  "id": "#9899713a-fd8e-4bf4-a3cd-e58544a2f684",
+                  "name": "wdg_speed",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[MotoChrono.eez-project]:/userWidgets/0",
+                    "permanent": false
+                  },
+                  "icon": "svg:user_widget"
+                },
+                {
+                  "type": "tab",
+                  "id": "#34feffea-3379-4bc2-9bcb-2ef866a74de9",
+                  "name": "ScreenRoute",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[MotoChrono.eez-project]:/userPages/1",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -207,7 +237,7 @@
             {
               "type": "row",
               "id": "#d2ce9b44-b47b-47cb-8d57-2ce0f87baaa2",
-              "weight": 20,
+              "weight": 32.01552616446234,
               "children": [
                 {
                   "type": "tabset",
@@ -442,10 +472,22 @@
               "type": "tabset",
               "id": "RUNTIME-EDITORS",
               "weight": 1,
-              "selected": -1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
-              "children": []
+              "children": [
+                {
+                  "type": "tab",
+                  "id": "#45a03ba7-1086-4f2f-9a1c-de0eb6088fc0",
+                  "name": "Logo",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[MotoChrono.eez-project]:/userPages/0",
+                    "permanent": false
+                  },
+                  "icon": "svg:page"
+                }
+              ],
+              "active": true
             },
             {
               "type": "row",
@@ -840,7 +882,8 @@
                       "component": "styles",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1052,14 +1095,237 @@
     "[MotoChrono.eez-project]:/userPages/0[flow-state]": {
       "selectionFront": {},
       "selectionBack": {
-        "0": {}
+        "0": {
+          "1": {},
+          "2": {}
+        }
       },
       "transform": {
         "translate": {
           "x": -400,
           "y": -140.00000216744155
         },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/1[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "1": {},
+          "3": {},
+          "4": {}
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -325.15232391357426,
+          "y": -53.015826797485346
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/2[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {}
+      },
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/3[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {},
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/4[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {},
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/5[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {},
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
         "scale": 1
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userPages/6[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {},
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userWidgets/0[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {},
+        "1": {}
+      },
+      "transform": {
+        "translate": {
+          "x": -113.97174072265622,
+          "y": -91.23306274414068
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userWidgets/-1[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {},
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/lvglStyles/styles[tree-state]": {
+      "0": {
+        "$selected": true
+      },
+      "1": {},
+      "2": {},
+      "3": {},
+      "4": {},
+      "5": {}
+    },
+    "[MotoChrono.eez-project]:/userWidgets/1[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {},
+        "1": {}
+      },
+      "transform": {
+        "translate": {
+          "x": -110,
+          "y": -110
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userWidgets/2[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {},
+        "1": {
+          "$selected": true
+        },
+        "2": {}
+      },
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1.75
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[MotoChrono.eez-project]:/userWidgets/3[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {},
+        "1": {}
+      },
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -120
+        },
+        "scale": 1.75
       },
       "timeline": {
         "isEditorActive": false,
@@ -1075,6 +1341,7 @@
   "searchMatchWholeWord": false,
   "replaceEnabled": false,
   "replaceText": "",
+  "pageRuntimeFrontFace": true,
   "breakpoints": {},
   "watchExpressions": [],
   "showComponentDescriptions": true,
@@ -1083,11 +1350,12 @@
   "lvglPart": "INDICATOR",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "TEXT"
+    "TEXT",
+    "BACKGROUND"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 1,
+  "flowZoom": 1.75,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "D:\\WORKSPACE\\MotoChrono\\CBR929_Telemetry\\src\\ui"
 }
