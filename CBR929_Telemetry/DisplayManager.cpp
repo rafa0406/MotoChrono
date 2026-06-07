@@ -207,13 +207,24 @@ void DisplayManager::update(bool isButtonPressed) {
     snprintf(eez_speed, sizeof(eez_speed), "%d", (int)currentSpeed);
     snprintf(eez_max_speed, sizeof(eez_max_speed), "%d", (int)maxSpeed);
     snprintf(eez_g_force, sizeof(eez_g_force), "%.2f G", currentGForce);
-    snprintf(eez_fuel_value, sizeof(eez_fuel_value), "%.1f", FuelManager::getRemainingLiters());
+
+    // --- GESTION DE L'ESSENCE ---
+    float currentFuel = FuelManager::getRemainingLiters();
+    float maxFuel = (SettingsManager::tankCapacity > 0) ? SettingsManager::tankCapacity : 18.0f;
+
+    // 1. Pour le Label texte (On garde la vraie valeur en Litres avec 1 décimale)
+    snprintf(eez_fuel_value, sizeof(eez_fuel_value), "%.1f", currentFuel);
+    
+    // 2. Pour la Jauge (On convertit en Pourcentage 0-100)
+    int fuelPercent = (int)((currentFuel / maxFuel) * 100.0f);
+    if (fuelPercent > 100) fuelPercent = 100; // Sécurité graphique
+    if (fuelPercent < 0) fuelPercent = 0;     // Sécurité graphique
+    eez_fuel_int = fuelPercent;
     
     // Nouveaux tampons String pour le Roll et Pitch
     snprintf(eez_roll_str, sizeof(eez_roll_str), "%d", (int)currentRoll);
     snprintf(eez_pitch_str, sizeof(eez_pitch_str), "%d", (int)currentPitch);
 
-    eez_fuel_int = (int32_t)FuelManager::getRemainingLiters();
     eez_roll_int = (int32_t)currentRoll;
     eez_pitch_int = (int32_t)currentPitch;
 

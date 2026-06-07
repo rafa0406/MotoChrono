@@ -40,7 +40,7 @@ void remove_style_titre(lv_obj_t *obj) {
 
 void init_style_speed_MAIN_DEFAULT(lv_style_t *style) {
     lv_style_set_text_color(style, lv_color_hex(0xf6ff00));
-    lv_style_set_text_font(style, &lv_font_montserrat_48);
+    lv_style_set_text_font(style, &ui_font_dseg7_classic_bolt_48);
     lv_style_set_text_align(style, LV_TEXT_ALIGN_RIGHT);
     lv_style_set_align(style, LV_ALIGN_TOP_RIGHT);
 };
@@ -100,7 +100,7 @@ void remove_style_kmh(lv_obj_t *obj) {
 
 void init_style_speed_max_MAIN_DEFAULT(lv_style_t *style) {
     lv_style_set_text_color(style, lv_color_hex(0x00fffd));
-    lv_style_set_text_font(style, &lv_font_montserrat_48);
+    lv_style_set_text_font(style, &ui_font_dseg7_classic_bolt_48);
     lv_style_set_text_align(style, LV_TEXT_ALIGN_RIGHT);
     lv_style_set_align(style, LV_ALIGN_TOP_RIGHT);
 };

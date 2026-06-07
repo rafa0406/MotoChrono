@@ -40,7 +40,7 @@
 // ==========================================
 
 // --- Paramètres Carburant ---
-#define TANK_CAPACITY_LITERS  18.0f
+#define TANK_CAPACITY_LITERS  10.0f
 
 // COEFFICIENT À CALIBRER (Litres consommés par milliseconde d'injection)
 // Valeur initiale très faible, à ajuster après le premier plein.

@@ -33,9 +33,6 @@ typedef struct _objects_t {
     lv_obj_t *text_moto_chrono_logo;
     lv_obj_t *text_signature_logo;
     lv_obj_t *label_titre_route;
-    lv_obj_t *wdg_route_speed;
-    lv_obj_t *wdg_route_speed__label_speed;
-    lv_obj_t *wdg_route_speed__label_kmh;
     lv_obj_t *wdg_route_gps;
     lv_obj_t *wdg_route_gps__label_gps;
     lv_obj_t *wdg_route_gps__led_gps_green;
@@ -43,9 +40,6 @@ typedef struct _objects_t {
     lv_obj_t *wdg_route_rec;
     lv_obj_t *wdg_route_rec__label_rec;
     lv_obj_t *wdg_route_rec__led_rec;
-    lv_obj_t *wdg_route_max_speed;
-    lv_obj_t *wdg_route_max_speed__label_max_speed;
-    lv_obj_t *wdg_route_max_speed__label_kmh_max;
     lv_obj_t *ligne_horizontale;
     lv_obj_t *led_route_fuel_in_reserve;
     lv_obj_t *bar_route_fuel;
@@ -55,10 +49,14 @@ typedef struct _objects_t {
     lv_obj_t *label_route_fuel_liters_value_average;
     lv_obj_t *label_l_100km;
     lv_obj_t *ligne_verticale;
+    lv_obj_t *obj0;
+    lv_obj_t *obj0__label_speed;
+    lv_obj_t *obj0__label_kmh;
+    lv_obj_t *obj1;
+    lv_obj_t *obj1__label_max_speed;
+    lv_obj_t *obj1__label_kmh_max;
+    lv_obj_t *ligne_verticale_1;
     lv_obj_t *label_titre_piste;
-    lv_obj_t *wdg_route_speed_1;
-    lv_obj_t *wdg_route_speed_1__label_speed;
-    lv_obj_t *wdg_route_speed_1__label_kmh;
     lv_obj_t *wdg_route_gps_1;
     lv_obj_t *wdg_route_gps_1__label_gps;
     lv_obj_t *wdg_route_gps_1__led_gps_green;
@@ -66,9 +64,6 @@ typedef struct _objects_t {
     lv_obj_t *wdg_route_rec_1;
     lv_obj_t *wdg_route_rec_1__label_rec;
     lv_obj_t *wdg_route_rec_1__led_rec;
-    lv_obj_t *wdg_route_max_speed_1;
-    lv_obj_t *wdg_route_max_speed_1__label_max_speed;
-    lv_obj_t *wdg_route_max_speed_1__label_kmh_max;
     lv_obj_t *slider_piste_pitch;
     lv_obj_t *led_route_fuel_in_reserve_1;
     lv_obj_t *label_piste_gforce;
@@ -78,6 +73,15 @@ typedef struct _objects_t {
     lv_obj_t *label_piste_roll;
     lv_obj_t *label_piste_roll_degres;
     lv_obj_t *label_piste_roll_degres_1;
+    lv_obj_t *label_piste_reserve;
+    lv_obj_t *ligne_horizontale_1;
+    lv_obj_t *obj2;
+    lv_obj_t *obj2__label_speed;
+    lv_obj_t *obj2__label_kmh;
+    lv_obj_t *obj3;
+    lv_obj_t *obj3__label_max_speed;
+    lv_obj_t *obj3__label_kmh_max;
+    lv_obj_t *ligne_verticale_2;
 } objects_t;
 
 extern objects_t objects;

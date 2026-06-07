@@ -393,9 +393,9 @@
             {
               "objID": "c735e4a2-59bd-43a4-dbef-0f293f466e3c",
               "type": "LVGLLabelWidget",
-              "left": 205,
-              "top": 209,
-              "width": 20,
+              "left": 196,
+              "top": 217,
+              "width": 39,
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
@@ -435,7 +435,7 @@
                 }
               },
               "groupIndex": 0,
-              "text": "RC",
+              "text": "V 1.0.1",
               "textType": "literal",
               "longMode": "CLIP",
               "recolor": false
@@ -543,51 +543,6 @@
               "recolor": false
             },
             {
-              "objID": "899176f5-bcf5-44da-ac6d-21dfba16e27e",
-              "type": "LVGLUserWidgetWidget",
-              "left": 20,
-              "top": 31,
-              "width": 100,
-              "height": 65,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "eebe42a0-c133-4e0a-89e7-53f6a7faa6e4",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [],
-              "identifier": "wdg_route_speed",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [],
-              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "localStyles": {
-                "objID": "71127b98-51d8-4ef4-c91a-a26961afc8eb"
-              },
-              "group": "",
-              "groupIndex": 0,
-              "userWidgetPageName": "wdg_speed",
-              "userPropertyValues": {
-                "objID": "0a35187f-670b-43a7-99fe-b21aa49c59e2",
-                "values": {}
-              }
-            },
-            {
               "objID": "9d740e5c-403b-4f7b-dc39-01225f3f8dfd",
               "type": "LVGLUserWidgetWidget",
               "left": 0,
@@ -678,56 +633,11 @@
               }
             },
             {
-              "objID": "3345e9ec-7951-4c27-ec5b-458d4cdd14b3",
-              "type": "LVGLUserWidgetWidget",
-              "left": 120,
-              "top": 31,
-              "width": 100,
-              "height": 65,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "e9e231cd-8b87-4e5f-a35e-90e3144934d0",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [],
-              "identifier": "wdg_route_max_speed",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [],
-              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "localStyles": {
-                "objID": "7e94a21c-87a2-4174-969d-a4910ba45af8"
-              },
-              "group": "",
-              "groupIndex": 0,
-              "userWidgetPageName": "wdg_max_speed",
-              "userPropertyValues": {
-                "objID": "321e036a-c224-460a-e57a-4173cf6017ed",
-                "values": {}
-              }
-            },
-            {
               "objID": "dc65d95c-7664-43f2-89cf-f903c133ddef",
               "type": "LVGLLineWidget",
-              "left": 0,
+              "left": 19,
               "top": 100,
-              "width": 241,
+              "width": 201,
               "height": 1,
               "customInputs": [],
               "customOutputs": [],
@@ -769,7 +679,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "points": "0,0 240,0",
+              "points": "0,0 200,0",
               "needleLength": 0,
               "value": 0,
               "valueType": "literal",
@@ -878,12 +788,12 @@
               "groupIndex": 0,
               "min": 0,
               "minType": "literal",
-              "max": "fuel_max",
-              "maxType": "expression",
+              "max": 100,
+              "maxType": "literal",
               "mode": "NORMAL",
               "value": "fuel_value_int",
               "valueType": "expression",
-              "previewValue": "18",
+              "previewValue": "60",
               "valueStart": 0,
               "valueStartType": "literal",
               "previewValueStart": "0",
@@ -943,7 +853,7 @@
             {
               "objID": "b02e7223-ec8b-4034-f2ea-9ea5b1b127da",
               "type": "LVGLLabelWidget",
-              "left": 12,
+              "left": 10,
               "top": 124,
               "width": 91,
               "height": 52,
@@ -991,12 +901,12 @@
               "textType": "expression",
               "longMode": "WRAP",
               "recolor": false,
-              "previewValue": "18.0"
+              "previewValue": "10.0"
             },
             {
               "objID": "334c3186-f79b-45fa-c51c-74cbfc6825f8",
               "type": "LVGLLabelWidget",
-              "left": 104,
+              "left": 100,
               "top": 148,
               "width": 12,
               "height": 22,
@@ -1047,7 +957,7 @@
             {
               "objID": "749b45c5-80c7-4e68-a43c-ace98a962c9a",
               "type": "LVGLLabelWidget",
-              "left": 132,
+              "left": 125,
               "top": 150,
               "width": 30,
               "height": 22,
@@ -1100,7 +1010,7 @@
             {
               "objID": "da6cae54-2f49-4710-8d2d-e9a5242ba9df",
               "type": "LVGLLabelWidget",
-              "left": 165,
+              "left": 159,
               "top": 154,
               "width": 61,
               "height": 16,
@@ -1151,8 +1061,8 @@
             {
               "objID": "3c814101-94f5-45a3-fdb6-201c2dc978a5",
               "type": "LVGLLineWidget",
-              "left": 125,
-              "top": 124,
+              "left": 119,
+              "top": 125,
               "width": 1,
               "height": 51,
               "customInputs": [],
@@ -1187,7 +1097,148 @@
                   "MAIN": {
                     "DEFAULT": {
                       "line_width": 2,
-                      "line_color": "#5E5E5E"
+                      "line_color": "#254B1B"
+                    }
+                  }
+                }
+              },
+              "group": "",
+              "groupIndex": 0,
+              "points": "0,0 0,50",
+              "invertY": false,
+              "needleLength": 0,
+              "value": 0,
+              "valueType": "literal",
+              "previewValue": 0
+            },
+            {
+              "objID": "c0485c68-63a8-4b3a-abc7-50fa23b44208",
+              "type": "LVGLUserWidgetWidget",
+              "left": 19,
+              "top": 24,
+              "width": 100,
+              "height": 70,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "f272ee44-592e-4088-895f-632ae35d26f7",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "px",
+              "heightUnit": "px",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlag": true,
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "7f953600-62b5-4517-e2a8-2c62bbfa6a84"
+              },
+              "group": "",
+              "groupIndex": 0,
+              "userWidgetPageName": "wdg_speed",
+              "userPropertyValues": {
+                "objID": "9f64b539-b782-48ea-f9af-fe5f0d94db5a",
+                "values": {}
+              }
+            },
+            {
+              "objID": "fcd9c3da-c49b-4b4e-d6c2-dd0ea3dd8fb6",
+              "type": "LVGLUserWidgetWidget",
+              "left": 127,
+              "top": 24,
+              "width": 100,
+              "height": 70,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "10f4097f-de2e-42b2-8df6-2838a4ceca85",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "px",
+              "heightUnit": "px",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlag": true,
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "ca9f5e9b-a945-434d-9dd3-431f05ab7d2f"
+              },
+              "group": "",
+              "groupIndex": 0,
+              "userWidgetPageName": "wdg_max_speed",
+              "userPropertyValues": {
+                "objID": "23d8e0ca-0f4a-4e8b-dff9-c71acae8f075",
+                "values": {}
+              }
+            },
+            {
+              "objID": "7bc81327-5ed3-4c22-d06d-a9b7cae91915",
+              "type": "LVGLLineWidget",
+              "left": 120,
+              "top": 24,
+              "width": 1,
+              "height": 51,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "267cdba6-dbc4-4382-dd9f-2074b8369a9a",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "identifier": "ligne_verticale_1",
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "content",
+              "heightUnit": "content",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "ffc94118-76c3-4198-fe4c-66179d01adc2",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "line_width": 2,
+                      "line_color": "#254B1B"
                     }
                   }
                 }
@@ -1305,51 +1356,6 @@
               "recolor": false
             },
             {
-              "objID": "578b9a59-2bf7-4ea5-c14b-83d56aa6acdb",
-              "type": "LVGLUserWidgetWidget",
-              "left": 20,
-              "top": 31,
-              "width": 100,
-              "height": 65,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "bbaa5eda-050c-4389-e150-07b4f9494eb1",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [],
-              "identifier": "wdg_route_speed_1",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [],
-              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "localStyles": {
-                "objID": "5edfbecf-4343-4470-e1ad-5affba9e3f0d"
-              },
-              "group": "",
-              "groupIndex": 0,
-              "userWidgetPageName": "wdg_speed",
-              "userPropertyValues": {
-                "objID": "a40a5519-da34-424b-98dd-a96225657dc9",
-                "values": {}
-              }
-            },
-            {
               "objID": "a1132e29-e1da-4b03-c4ac-48f2ef56716a",
               "type": "LVGLUserWidgetWidget",
               "left": 0,
@@ -1436,51 +1442,6 @@
               "userWidgetPageName": "wdg_rec",
               "userPropertyValues": {
                 "objID": "fd7aa417-1bc7-4030-e1bb-9d70d4d716e0",
-                "values": {}
-              }
-            },
-            {
-              "objID": "b62f3a95-39fb-4d4f-cc9f-092c017b29cf",
-              "type": "LVGLUserWidgetWidget",
-              "left": 120,
-              "top": 31,
-              "width": 100,
-              "height": 65,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "04c4f7ca-9760-4b57-d421-bdee718ad5f9",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "timeline": [],
-              "eventHandlers": [],
-              "identifier": "wdg_route_max_speed_1",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "px",
-              "heightUnit": "px",
-              "children": [],
-              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
-              "hiddenFlagType": "literal",
-              "clickableFlag": true,
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "localStyles": {
-                "objID": "caa8a810-03ef-47cc-c79d-062423ad5441"
-              },
-              "group": "",
-              "groupIndex": 0,
-              "userWidgetPageName": "wdg_max_speed",
-              "userPropertyValues": {
-                "objID": "6a561a06-6cf5-4d01-a059-bd000468ddff",
                 "values": {}
               }
             },
@@ -1605,7 +1566,7 @@
               "objID": "71bb6de3-ceff-488a-b699-8121cf86f0e0",
               "type": "LVGLLabelWidget",
               "left": -102,
-              "top": 112,
+              "top": 119,
               "width": 35,
               "height": 30,
               "customInputs": [],
@@ -1657,10 +1618,10 @@
             {
               "objID": "55cf03af-a96e-4979-f8de-974d4d5daace",
               "type": "LVGLLabelWidget",
-              "left": 83,
-              "top": 142,
-              "width": 74,
-              "height": 22,
+              "left": 93,
+              "top": 149,
+              "width": 53,
+              "height": 16,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -1693,7 +1654,7 @@
                   "MAIN": {
                     "DEFAULT": {
                       "text_color": "#1FFF00",
-                      "text_font": "MONTSERRAT_20"
+                      "text_font": "MONTSERRAT_14"
                     }
                   }
                 }
@@ -1823,7 +1784,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "roll_value",
+              "text": "pitch_value",
               "textType": "expression",
               "longMode": "WRAP",
               "recolor": false,
@@ -1832,7 +1793,7 @@
             {
               "objID": "cb1b3cad-eccc-4e51-f4e1-1050101c6b43",
               "type": "LVGLLabelWidget",
-              "left": -1,
+              "left": 0,
               "top": -38,
               "width": 13,
               "height": 22,
@@ -1876,7 +1837,7 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "pitch_value",
+              "text": "roll_value",
               "textType": "expression",
               "longMode": "WRAP",
               "recolor": false,
@@ -1885,7 +1846,7 @@
             {
               "objID": "c93860cf-eb6f-49a9-b4e8-d98ee29518b8",
               "type": "LVGLLabelWidget",
-              "left": 130,
+              "left": 131,
               "top": 180,
               "width": 8,
               "height": 22,
@@ -1928,8 +1889,8 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "pitch_value",
-              "textType": "expression",
+              "text": "°",
+              "textType": "literal",
               "longMode": "WRAP",
               "recolor": false,
               "previewValue": "°"
@@ -1980,11 +1941,256 @@
               },
               "group": "",
               "groupIndex": 0,
-              "text": "pitch_value",
-              "textType": "expression",
+              "text": "°",
+              "textType": "literal",
               "longMode": "WRAP",
               "recolor": false,
-              "previewValue": "°"
+              "previewValue": ""
+            },
+            {
+              "objID": "a21bacb2-1384-41e7-d2e7-c7a2a8f21617",
+              "type": "LVGLLabelWidget",
+              "left": 164,
+              "top": 149,
+              "width": 66,
+              "height": 16,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "e1334398-cf03-48c4-dfe9-1febe8067740",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "identifier": "label_piste_reserve",
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "content",
+              "heightUnit": "content",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlag": "fuel_is_reseve",
+              "hiddenFlagType": "expression",
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "c966587d-b1b7-44d0-e399-3bed090e85d3",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "text_color": "#FFA000"
+                    }
+                  }
+                }
+              },
+              "group": "",
+              "groupIndex": 0,
+              "text": "RESERVE",
+              "textType": "literal",
+              "longMode": "WRAP",
+              "recolor": false
+            },
+            {
+              "objID": "62aac7e5-ea22-48ab-a314-efb23f6da41b",
+              "type": "LVGLLineWidget",
+              "left": 19,
+              "top": 100,
+              "width": 201,
+              "height": 1,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "bdf50cd5-68f6-42ae-965b-2abdb61769d1",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "identifier": "ligne_horizontale_1",
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "content",
+              "heightUnit": "content",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "ac48caf7-10a6-44ab-813c-ae5bb85467e9",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "line_color": "#FFFFFF",
+                      "line_opa": 255,
+                      "line_width": 2
+                    }
+                  }
+                }
+              },
+              "group": "",
+              "groupIndex": 0,
+              "points": "0,0 200,0",
+              "needleLength": 0,
+              "value": 0,
+              "valueType": "literal",
+              "previewValue": 0
+            },
+            {
+              "objID": "f5001ed7-50ca-4e00-8d61-2541f8688adf",
+              "type": "LVGLUserWidgetWidget",
+              "left": 19,
+              "top": 24,
+              "width": 100,
+              "height": 70,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "0ab8ee1a-c017-496c-bf7c-4fb2101497da",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "px",
+              "heightUnit": "px",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlag": true,
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "1bca1ab5-34a7-4bad-9115-be1f90cf7261"
+              },
+              "group": "",
+              "groupIndex": 0,
+              "userWidgetPageName": "wdg_speed",
+              "userPropertyValues": {
+                "objID": "daecdcb7-2bd4-46c2-d538-5ae49c811857",
+                "values": {}
+              }
+            },
+            {
+              "objID": "a8cf8680-19a0-4a54-cca2-2d604588f985",
+              "type": "LVGLUserWidgetWidget",
+              "left": 127,
+              "top": 24,
+              "width": 100,
+              "height": 70,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "bc4660e9-d891-446c-e5e6-518b3057b20f",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "px",
+              "heightUnit": "px",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlag": true,
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "675136ab-53f0-4e4e-80f2-53da3917f9d3"
+              },
+              "group": "",
+              "groupIndex": 0,
+              "userWidgetPageName": "wdg_max_speed",
+              "userPropertyValues": {
+                "objID": "c96db1b4-51a3-41cb-fbf3-30fe62ef6f83",
+                "values": {}
+              }
+            },
+            {
+              "objID": "df652f7e-3453-4793-c9e6-5fbf97f963e0",
+              "type": "LVGLLineWidget",
+              "left": 120,
+              "top": 24,
+              "width": 1,
+              "height": 51,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "70bd6498-b4eb-4bb0-d5a0-5b2f1cb27b89",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "identifier": "ligne_verticale_2",
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "content",
+              "heightUnit": "content",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "localStyles": {
+                "objID": "279fc319-71fd-4081-f075-d54655fb1a13",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "line_width": 2,
+                      "line_color": "#254B1B"
+                    }
+                  }
+                }
+              },
+              "group": "",
+              "groupIndex": 0,
+              "points": "0,0 0,50",
+              "invertY": false,
+              "needleLength": 0,
+              "value": 0,
+              "valueType": "literal",
+              "previewValue": 0
             }
           ],
           "widgetFlags": "CLICKABLE|PRESS_LOCK|CLICK_FOCUSABLE|GESTURE_BUBBLE|SNAPPABLE|SCROLLABLE|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER",
@@ -2232,10 +2438,10 @@
         {
           "objID": "7a722c2c-37fa-4b29-92c7-82616028a10e",
           "type": "LVGLLabelWidget",
-          "left": -9,
-          "top": 0,
-          "width": 32,
-          "height": 52,
+          "left": -8,
+          "top": 1,
+          "width": 39,
+          "height": 48,
           "customInputs": [],
           "customOutputs": [],
           "style": {
@@ -2278,7 +2484,7 @@
         {
           "objID": "1d21bbcc-5e36-4e75-f773-443566c358bf",
           "type": "LVGLLabelWidget",
-          "left": -9,
+          "left": -8,
           "top": 0,
           "width": 40,
           "height": 16,
@@ -2336,7 +2542,7 @@
       "left": 0,
       "top": 0,
       "width": 100,
-      "height": 65,
+      "height": 70,
       "isUsedAsUserWidget": true,
       "createAtStart": true,
       "deleteOnScreenUnload": false
@@ -2347,10 +2553,10 @@
         {
           "objID": "a1c236b7-214e-4414-b830-5cd26fae48cf",
           "type": "LVGLLabelWidget",
-          "left": -9,
-          "top": 0,
-          "width": 82,
-          "height": 52,
+          "left": -7,
+          "top": 1,
+          "width": 117,
+          "height": 48,
           "customInputs": [],
           "customOutputs": [],
           "style": {
@@ -2392,8 +2598,8 @@
         {
           "objID": "38db219c-d6f5-4b9a-8167-de58b46fc19a",
           "type": "LVGLLabelWidget",
-          "left": 16,
-          "top": 49,
+          "left": 18,
+          "top": 54,
           "width": 75,
           "height": 16,
           "customInputs": [],
@@ -2449,7 +2655,7 @@
       "left": 0,
       "top": 0,
       "width": 100,
-      "height": 65,
+      "height": 70,
       "isUsedAsUserWidget": true,
       "createAtStart": true,
       "deleteOnScreenUnload": false
@@ -2767,7 +2973,7 @@
             "MAIN": {
               "DEFAULT": {
                 "text_color": "#F6FF00",
-                "text_font": "MONTSERRAT_48",
+                "text_font": "DSEG7_classic_bolt_48",
                 "text_align": "RIGHT",
                 "align": "TOP_RIGHT"
               }
@@ -2803,7 +3009,7 @@
             "MAIN": {
               "DEFAULT": {
                 "text_color": "#00FFFD",
-                "text_font": "MONTSERRAT_48",
+                "text_font": "DSEG7_classic_bolt_48",
                 "text_align": "RIGHT",
                 "align": "TOP_RIGHT"
               }
@@ -2851,7 +3057,37 @@
     "objID": "f2f79c21-8769-ed90-c624-7405d4136ec9",
     "groups": []
   },
-  "fonts": [],
+  "fonts": [
+    {
+      "objID": "d3dffba3-e552-4fcf-d565-82f9cb528742",
+      "name": "DSEG7_classic_bolt_48",
+      "renderingEngine": "LVGL",
+      "source": {
+        "objID": "8a97079c-ccaf-471f-f098-e9aa1dcf3308",
+        "filePath": "..\\..\\..\\DOWNLOAD\\dseg7\\DSEG7-Classic\\DSEG7Classic-Bold.ttf",
+        "size": 48
+      },
+      "embeddedFontFile": "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IABpAHMAIABhAGwAcwBvACAAYQB2AGEAaQBsAGEAYgBsAGUAIAB3AGkAdABoACAAYQAgAEYAQQBRACAAYQB0ADoACgBoAHQAdABwADoALwAvAHMAYwByAGkAcAB0AHMALgBzAGkAbAAuAG8AcgBnAC8ATwBGAEwACgAKAAoALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAAoAUwBJAEwAIABPAFAARQBOACAARgBPAE4AVAAgAEwASQBDAEUATgBTAEUAIABWAGUAcgBzAGkAbwBuACAAMQAuADEAIAAtACAAMgA2ACAARgBlAGIAcgB1AGEAcgB5ACAAMgAwADAANwAKAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAtAC0ALQAKAAoAUABSAEUAQQBNAEIATABFAAoAVABoAGUAIABnAG8AYQBsAHMAIABvAGYAIAB0AGgAZQAgAE8AcABlAG4AIABGAG8AbgB0ACAATABpAGMAZQBuAHMAZQAgACgATwBGAEwAKQAgAGEAcgBlACAAdABvACAAcwB0AGkAbQB1AGwAYQB0AGUAIAB3AG8AcgBsAGQAdwBpAGQAZQAKAGQAZQB2AGUAbABvAHAAbQBlAG4AdAAgAG8AZgAgAGMAbwBsAGwAYQBiAG8AcgBhAHQAaQB2AGUAIABmAG8AbgB0ACAAcAByAG8AagBlAGMAdABzACwAIAB0AG8AIABzAHUAcABwAG8AcgB0ACAAdABoAGUAIABmAG8AbgB0ACAAYwByAGUAYQB0AGkAbwBuAAoAZQBmAGYAbwByAHQAcwAgAG8AZgAgAGEAYwBhAGQAZQBtAGkAYwAgAGEAbgBkACAAbABpAG4AZwB1AGkAcwB0AGkAYwAgAGMAbwBtAG0AdQBuAGkAdABpAGUAcwAsACAAYQBuAGQAIAB0AG8AIABwAHIAbwB2AGkAZABlACAAYQAgAGYAcgBlAGUAIABhAG4AZAAKAG8AcABlAG4AIABmAHIAYQBtAGUAdwBvAHIAawAgAGkAbgAgAHcAaABpAGMAaAAgAGYAbwBuAHQAcwAgAG0AYQB5ACAAYgBlACAAcwBoAGEAcgBlAGQAIABhAG4AZAAgAGkAbQBwAHIAbwB2AGUAZAAgAGkAbgAgAHAAYQByAHQAbgBlAHIAcwBoAGkAcAAKAHcAaQB0AGgAIABvAHQAaABlAHIAcwAuAAoACgBUAGgAZQAgAE8ARgBMACAAYQBsAGwAbwB3AHMAIAB0AGgAZQAgAGwAaQBjAGUAbgBzAGUAZAAgAGYAbwBuAHQAcwAgAHQAbwAgAGIAZQAgAHUAcwBlAGQALAAgAHMAdAB1AGQAaQBlAGQALAAgAG0AbwBkAGkAZgBpAGUAZAAgAGEAbgBkAAoAcgBlAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAGYAcgBlAGUAbAB5ACAAYQBzACAAbABvAG4AZwAgAGEAcwAgAHQAaABlAHkAIABhAHIAZQAgAG4AbwB0ACAAcwBvAGwAZAAgAGIAeQAgAHQAaABlAG0AcwBlAGwAdgBlAHMALgAgAFQAaABlAAoAZgBvAG4AdABzACwAIABpAG4AYwBsAHUAZABpAG4AZwAgAGEAbgB5ACAAZABlAHIAaQB2AGEAdABpAHYAZQAgAHcAbwByAGsAcwAsACAAYwBhAG4AIABiAGUAIABiAHUAbgBkAGwAZQBkACwAIABlAG0AYgBlAGQAZABlAGQALAAgAAoAcgBlAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAGEAbgBkAC8AbwByACAAcwBvAGwAZAAgAHcAaQB0AGgAIABhAG4AeQAgAHMAbwBmAHQAdwBhAHIAZQAgAHAAcgBvAHYAaQBkAGUAZAAgAHQAaABhAHQAIABhAG4AeQAgAHIAZQBzAGUAcgB2AGUAZAAKAG4AYQBtAGUAcwAgAGEAcgBlACAAbgBvAHQAIAB1AHMAZQBkACAAYgB5ACAAZABlAHIAaQB2AGEAdABpAHYAZQAgAHcAbwByAGsAcwAuACAAVABoAGUAIABmAG8AbgB0AHMAIABhAG4AZAAgAGQAZQByAGkAdgBhAHQAaQB2AGUAcwAsAAoAaABvAHcAZQB2AGUAcgAsACAAYwBhAG4AbgBvAHQAIABiAGUAIAByAGUAbABlAGEAcwBlAGQAIAB1AG4AZABlAHIAIABhAG4AeQAgAG8AdABoAGUAcgAgAHQAeQBwAGUAIABvAGYAIABsAGkAYwBlAG4AcwBlAC4AIABUAGgAZQAKAHIAZQBxAHUAaQByAGUAbQBlAG4AdAAgAGYAbwByACAAZgBvAG4AdABzACAAdABvACAAcgBlAG0AYQBpAG4AIAB1AG4AZABlAHIAIAB0AGgAaQBzACAAbABpAGMAZQBuAHMAZQAgAGQAbwBlAHMAIABuAG8AdAAgAGEAcABwAGwAeQAKAHQAbwAgAGEAbgB5ACAAZABvAGMAdQBtAGUAbgB0ACAAYwByAGUAYQB0AGUAZAAgAHUAcwBpAG4AZwAgAHQAaABlACAAZgBvAG4AdABzACAAbwByACAAdABoAGUAaQByACAAZABlAHIAaQB2AGEAdABpAHYAZQBzAC4ACgAKAEQARQBGAEkATgBJAFQASQBPAE4AUwAKACIARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAiACAAcgBlAGYAZQByAHMAIAB0AG8AIAB0AGgAZQAgAHMAZQB0ACAAbwBmACAAZgBpAGwAZQBzACAAcgBlAGwAZQBhAHMAZQBkACAAYgB5ACAAdABoAGUAIABDAG8AcAB5AHIAaQBnAGgAdAAKAEgAbwBsAGQAZQByACgAcwApACAAdQBuAGQAZQByACAAdABoAGkAcwAgAGwAaQBjAGUAbgBzAGUAIABhAG4AZAAgAGMAbABlAGEAcgBsAHkAIABtAGEAcgBrAGUAZAAgAGEAcwAgAHMAdQBjAGgALgAgAFQAaABpAHMAIABtAGEAeQAKAGkAbgBjAGwAdQBkAGUAIABzAG8AdQByAGMAZQAgAGYAaQBsAGUAcwAsACAAYgB1AGkAbABkACAAcwBjAHIAaQBwAHQAcwAgAGEAbgBkACAAZABvAGMAdQBtAGUAbgB0AGEAdABpAG8AbgAuAAoACgAiAFIAZQBzAGUAcgB2AGUAZAAgAEYAbwBuAHQAIABOAGEAbQBlACIAIAByAGUAZgBlAHIAcwAgAHQAbwAgAGEAbgB5ACAAbgBhAG0AZQBzACAAcwBwAGUAYwBpAGYAaQBlAGQAIABhAHMAIABzAHUAYwBoACAAYQBmAHQAZQByACAAdABoAGUACgBjAG8AcAB5AHIAaQBnAGgAdAAgAHMAdABhAHQAZQBtAGUAbgB0ACgAcwApAC4ACgAKACIATwByAGkAZwBpAG4AYQBsACAAVgBlAHIAcwBpAG8AbgAiACAAcgBlAGYAZQByAHMAIAB0AG8AIAB0AGgAZQAgAGMAbwBsAGwAZQBjAHQAaQBvAG4AIABvAGYAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlACAAYwBvAG0AcABvAG4AZQBuAHQAcwAgAGEAcwAKAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAGIAeQAgAHQAaABlACAAQwBvAHAAeQByAGkAZwBoAHQAIABIAG8AbABkAGUAcgAoAHMAKQAuAAoACgAiAE0AbwBkAGkAZgBpAGUAZAAgAFYAZQByAHMAaQBvAG4AIgAgAHIAZQBmAGUAcgBzACAAdABvACAAYQBuAHkAIABkAGUAcgBpAHYAYQB0AGkAdgBlACAAbQBhAGQAZQAgAGIAeQAgAGEAZABkAGkAbgBnACAAdABvACwAIABkAGUAbABlAHQAaQBuAGcALAAKAG8AcgAgAHMAdQBiAHMAdABpAHQAdQB0AGkAbgBnACAALQAtACAAaQBuACAAcABhAHIAdAAgAG8AcgAgAGkAbgAgAHcAaABvAGwAZQAgAC0ALQAgAGEAbgB5ACAAbwBmACAAdABoAGUAIABjAG8AbQBwAG8AbgBlAG4AdABzACAAbwBmACAAdABoAGUACgBPAHIAaQBnAGkAbgBhAGwAIABWAGUAcgBzAGkAbwBuACwAIABiAHkAIABjAGgAYQBuAGcAaQBuAGcAIABmAG8AcgBtAGEAdABzACAAbwByACAAYgB5ACAAcABvAHIAdABpAG4AZwAgAHQAaABlACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAHQAbwAgAGEACgBuAGUAdwAgAGUAbgB2AGkAcgBvAG4AbQBlAG4AdAAuAAoACgAiAEEAdQB0AGgAbwByACIAIAByAGUAZgBlAHIAcwAgAHQAbwAgAGEAbgB5ACAAZABlAHMAaQBnAG4AZQByACwAIABlAG4AZwBpAG4AZQBlAHIALAAgAHAAcgBvAGcAcgBhAG0AbQBlAHIALAAgAHQAZQBjAGgAbgBpAGMAYQBsAAoAdwByAGkAdABlAHIAIABvAHIAIABvAHQAaABlAHIAIABwAGUAcgBzAG8AbgAgAHcAaABvACAAYwBvAG4AdAByAGkAYgB1AHQAZQBkACAAdABvACAAdABoAGUAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlAC4ACgAKAFAARQBSAE0ASQBTAFMASQBPAE4AIAAmACAAQwBPAE4ARABJAFQASQBPAE4AUwAKAFAAZQByAG0AaQBzAHMAaQBvAG4AIABpAHMAIABoAGUAcgBlAGIAeQAgAGcAcgBhAG4AdABlAGQALAAgAGYAcgBlAGUAIABvAGYAIABjAGgAYQByAGcAZQAsACAAdABvACAAYQBuAHkAIABwAGUAcgBzAG8AbgAgAG8AYgB0AGEAaQBuAGkAbgBnAAoAYQAgAGMAbwBwAHkAIABvAGYAIAB0AGgAZQAgAEYAbwBuAHQAIABTAG8AZgB0AHcAYQByAGUALAAgAHQAbwAgAHUAcwBlACwAIABzAHQAdQBkAHkALAAgAGMAbwBwAHkALAAgAG0AZQByAGcAZQAsACAAZQBtAGIAZQBkACwAIABtAG8AZABpAGYAeQAsAAoAcgBlAGQAaQBzAHQAcgBpAGIAdQB0AGUALAAgAGEAbgBkACAAcwBlAGwAbAAgAG0AbwBkAGkAZgBpAGUAZAAgAGEAbgBkACAAdQBuAG0AbwBkAGkAZgBpAGUAZAAgAGMAbwBwAGkAZQBzACAAbwBmACAAdABoAGUAIABGAG8AbgB0AAoAUwBvAGYAdAB3AGEAcgBlACwAIABzAHUAYgBqAGUAYwB0ACAAdABvACAAdABoAGUAIABmAG8AbABsAG8AdwBpAG4AZwAgAGMAbwBuAGQAaQB0AGkAbwBuAHMAOgAKAAoAMQApACAATgBlAGkAdABoAGUAcgAgAHQAaABlACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAG4AbwByACAAYQBuAHkAIABvAGYAIABpAHQAcwAgAGkAbgBkAGkAdgBpAGQAdQBhAGwAIABjAG8AbQBwAG8AbgBlAG4AdABzACwACgBpAG4AIABPAHIAaQBnAGkAbgBhAGwAIABvAHIAIABNAG8AZABpAGYAaQBlAGQAIABWAGUAcgBzAGkAbwBuAHMALAAgAG0AYQB5ACAAYgBlACAAcwBvAGwAZAAgAGIAeQAgAGkAdABzAGUAbABmAC4ACgAKADIAKQAgAE8AcgBpAGcAaQBuAGEAbAAgAG8AcgAgAE0AbwBkAGkAZgBpAGUAZAAgAFYAZQByAHMAaQBvAG4AcwAgAG8AZgAgAHQAaABlACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAG0AYQB5ACAAYgBlACAAYgB1AG4AZABsAGUAZAAsAAoAcgBlAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAGEAbgBkAC8AbwByACAAcwBvAGwAZAAgAHcAaQB0AGgAIABhAG4AeQAgAHMAbwBmAHQAdwBhAHIAZQAsACAAcAByAG8AdgBpAGQAZQBkACAAdABoAGEAdAAgAGUAYQBjAGgAIABjAG8AcAB5AAoAYwBvAG4AdABhAGkAbgBzACAAdABoAGUAIABhAGIAbwB2AGUAIABjAG8AcAB5AHIAaQBnAGgAdAAgAG4AbwB0AGkAYwBlACAAYQBuAGQAIAB0AGgAaQBzACAAbABpAGMAZQBuAHMAZQAuACAAVABoAGUAcwBlACAAYwBhAG4AIABiAGUACgBpAG4AYwBsAHUAZABlAGQAIABlAGkAdABoAGUAcgAgAGEAcwAgAHMAdABhAG4AZAAtAGEAbABvAG4AZQAgAHQAZQB4AHQAIABmAGkAbABlAHMALAAgAGgAdQBtAGEAbgAtAHIAZQBhAGQAYQBiAGwAZQAgAGgAZQBhAGQAZQByAHMAIABvAHIACgBpAG4AIAB0AGgAZQAgAGEAcABwAHIAbwBwAHIAaQBhAHQAZQAgAG0AYQBjAGgAaQBuAGUALQByAGUAYQBkAGEAYgBsAGUAIABtAGUAdABhAGQAYQB0AGEAIABmAGkAZQBsAGQAcwAgAHcAaQB0AGgAaQBuACAAdABlAHgAdAAgAG8AcgAKAGIAaQBuAGEAcgB5ACAAZgBpAGwAZQBzACAAYQBzACAAbABvAG4AZwAgAGEAcwAgAHQAaABvAHMAZQAgAGYAaQBlAGwAZABzACAAYwBhAG4AIABiAGUAIABlAGEAcwBpAGwAeQAgAHYAaQBlAHcAZQBkACAAYgB5ACAAdABoAGUAIAB1AHMAZQByAC4ACgAKADMAKQAgAE4AbwAgAE0AbwBkAGkAZgBpAGUAZAAgAFYAZQByAHMAaQBvAG4AIABvAGYAIAB0AGgAZQAgAEYAbwBuAHQAIABTAG8AZgB0AHcAYQByAGUAIABtAGEAeQAgAHUAcwBlACAAdABoAGUAIABSAGUAcwBlAHIAdgBlAGQAIABGAG8AbgB0AAoATgBhAG0AZQAoAHMAKQAgAHUAbgBsAGUAcwBzACAAZQB4AHAAbABpAGMAaQB0ACAAdwByAGkAdAB0AGUAbgAgAHAAZQByAG0AaQBzAHMAaQBvAG4AIABpAHMAIABnAHIAYQBuAHQAZQBkACAAYgB5ACAAdABoAGUAIABjAG8AcgByAGUAcwBwAG8AbgBkAGkAbgBnAAoAQwBvAHAAeQByAGkAZwBoAHQAIABIAG8AbABkAGUAcgAuACAAVABoAGkAcwAgAHIAZQBzAHQAcgBpAGMAdABpAG8AbgAgAG8AbgBsAHkAIABhAHAAcABsAGkAZQBzACAAdABvACAAdABoAGUAIABwAHIAaQBtAGEAcgB5ACAAZgBvAG4AdAAgAG4AYQBtAGUAIABhAHMACgBwAHIAZQBzAGUAbgB0AGUAZAAgAHQAbwAgAHQAaABlACAAdQBzAGUAcgBzAC4ACgAKADQAKQAgAFQAaABlACAAbgBhAG0AZQAoAHMAKQAgAG8AZgAgAHQAaABlACAAQwBvAHAAeQByAGkAZwBoAHQAIABIAG8AbABkAGUAcgAoAHMAKQAgAG8AcgAgAHQAaABlACAAQQB1AHQAaABvAHIAKABzACkAIABvAGYAIAB0AGgAZQAgAEYAbwBuAHQACgBTAG8AZgB0AHcAYQByAGUAIABzAGgAYQBsAGwAIABuAG8AdAAgAGIAZQAgAHUAcwBlAGQAIAB0AG8AIABwAHIAbwBtAG8AdABlACwAIABlAG4AZABvAHIAcwBlACAAbwByACAAYQBkAHYAZQByAHQAaQBzAGUAIABhAG4AeQAKAE0AbwBkAGkAZgBpAGUAZAAgAFYAZQByAHMAaQBvAG4ALAAgAGUAeABjAGUAcAB0ACAAdABvACAAYQBjAGsAbgBvAHcAbABlAGQAZwBlACAAdABoAGUAIABjAG8AbgB0AHIAaQBiAHUAdABpAG8AbgAoAHMAKQAgAG8AZgAgAHQAaABlAAoAQwBvAHAAeQByAGkAZwBoAHQAIABIAG8AbABkAGUAcgAoAHMAKQAgAGEAbgBkACAAdABoAGUAIABBAHUAdABoAG8AcgAoAHMAKQAgAG8AcgAgAHcAaQB0AGgAIAB0AGgAZQBpAHIAIABlAHgAcABsAGkAYwBpAHQAIAB3AHIAaQB0AHQAZQBuAAoAcABlAHIAbQBpAHMAcwBpAG8AbgAuAAoACgA1ACkAIABUAGgAZQAgAEYAbwBuAHQAIABTAG8AZgB0AHcAYQByAGUALAAgAG0AbwBkAGkAZgBpAGUAZAAgAG8AcgAgAHUAbgBtAG8AZABpAGYAaQBlAGQALAAgAGkAbgAgAHAAYQByAHQAIABvAHIAIABpAG4AIAB3AGgAbwBsAGUALAAKAG0AdQBzAHQAIABiAGUAIABkAGkAcwB0AHIAaQBiAHUAdABlAGQAIABlAG4AdABpAHIAZQBsAHkAIAB1AG4AZABlAHIAIAB0AGgAaQBzACAAbABpAGMAZQBuAHMAZQAsACAAYQBuAGQAIABtAHUAcwB0ACAAbgBvAHQAIABiAGUACgBkAGkAcwB0AHIAaQBiAHUAdABlAGQAIAB1AG4AZABlAHIAIABhAG4AeQAgAG8AdABoAGUAcgAgAGwAaQBjAGUAbgBzAGUALgAgAFQAaABlACAAcgBlAHEAdQBpAHIAZQBtAGUAbgB0ACAAZgBvAHIAIABmAG8AbgB0AHMAIAB0AG8ACgByAGUAbQBhAGkAbgAgAHUAbgBkAGUAcgAgAHQAaABpAHMAIABsAGkAYwBlAG4AcwBlACAAZABvAGUAcwAgAG4AbwB0ACAAYQBwAHAAbAB5ACAAdABvACAAYQBuAHkAIABkAG8AYwB1AG0AZQBuAHQAIABjAHIAZQBhAHQAZQBkAAoAdQBzAGkAbgBnACAAdABoAGUAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlAC4ACgAKAFQARQBSAE0ASQBOAEEAVABJAE8ATgAKAFQAaABpAHMAIABsAGkAYwBlAG4AcwBlACAAYgBlAGMAbwBtAGUAcwAgAG4AdQBsAGwAIABhAG4AZAAgAHYAbwBpAGQAIABpAGYAIABhAG4AeQAgAG8AZgAgAHQAaABlACAAYQBiAG8AdgBlACAAYwBvAG4AZABpAHQAaQBvAG4AcwAgAGEAcgBlAAoAbgBvAHQAIABtAGUAdAAuAAoACgBEAEkAUwBDAEwAQQBJAE0ARQBSAAoAVABIAEUAIABGAE8ATgBUACAAUwBPAEYAVABXAEEAUgBFACAASQBTACAAUABSAE8AVgBJAEQARQBEACAAIgBBAFMAIABJAFMAIgAsACAAVwBJAFQASABPAFUAVAAgAFcAQQBSAFIAQQBOAFQAWQAgAE8ARgAgAEEATgBZACAASwBJAE4ARAAsAAoARQBYAFAAUgBFAFMAUwAgAE8AUgAgAEkATQBQAEwASQBFAEQALAAgAEkATgBDAEwAVQBEAEkATgBHACAAQgBVAFQAIABOAE8AVAAgAEwASQBNAEkAVABFAEQAIABUAE8AIABBAE4AWQAgAFcAQQBSAFIAQQBOAFQASQBFAFMAIABPAEYACgBNAEUAUgBDAEgAQQBOAFQAQQBCAEkATABJAFQAWQAsACAARgBJAFQATgBFAFMAUwAgAEYATwBSACAAQQAgAFAAQQBSAFQASQBDAFUATABBAFIAIABQAFUAUgBQAE8AUwBFACAAQQBOAEQAIABOAE8ATgBJAE4ARgBSAEkATgBHAEUATQBFAE4AVAAKAE8ARgAgAEMATwBQAFkAUgBJAEcASABUACwAIABQAEEAVABFAE4AVAAsACAAVABSAEEARABFAE0AQQBSAEsALAAgAE8AUgAgAE8AVABIAEUAUgAgAFIASQBHAEgAVAAuACAASQBOACAATgBPACAARQBWAEUATgBUACAAUwBIAEEATABMACAAVABIAEUACgBDAE8AUABZAFIASQBHAEgAVAAgAEgATwBMAEQARQBSACAAQgBFACAATABJAEEAQgBMAEUAIABGAE8AUgAgAEEATgBZACAAQwBMAEEASQBNACwAIABEAEEATQBBAEcARQBTACAATwBSACAATwBUAEgARQBSACAATABJAEEAQgBJAEwASQBUAFkALAAKAEkATgBDAEwAVQBEAEkATgBHACAAQQBOAFkAIABHAEUATgBFAFIAQQBMACwAIABTAFAARQBDAEkAQQBMACwAIABJAE4ARABJAFIARQBDAFQALAAgAEkATgBDAEkARABFAE4AVABBAEwALAAgAE8AUgAgAEMATwBOAFMARQBRAFUARQBOAFQASQBBAEwACgBEAEEATQBBAEcARQBTACwAIABXAEgARQBUAEgARQBSACAASQBOACAAQQBOACAAQQBDAFQASQBPAE4AIABPAEYAIABDAE8ATgBUAFIAQQBDAFQALAAgAFQATwBSAFQAIABPAFIAIABPAFQASABFAFIAVwBJAFMARQAsACAAQQBSAEkAUwBJAE4ARwAKAEYAUgBPAE0ALAAgAE8AVQBUACAATwBGACAAVABIAEUAIABVAFMARQAgAE8AUgAgAEkATgBBAEIASQBMAEkAVABZACAAVABPACAAVQBTAEUAIABUAEgARQAgAEYATwBOAFQAIABTAE8ARgBUAFcAQQBSAEUAIABPAFIAIABGAFIATwBNAAoATwBUAEgARQBSACAARABFAEEATABJAE4ARwBTACAASQBOACAAVABIAEUAIABGAE8ATgBUACAAUwBPAEYAVABXAEEAUgBFAC4AAENvcHlyaWdodCAoYykgMjAxOCwga2VzaGlrYW4gKGh0dHA6Ly93d3cua2VzaGlrYW4ubmV0KSwKd2l0aCBSZXNlcnZlZCBGb250IE5hbWUgIkRTRUciLgoKVGhpcyBGb250IFNvZnR3YXJlIGlzIGxpY2Vuc2VkIHVuZGVyIHRoZSBTSUwgT3BlbiBGb250IExpY2Vuc2UsIFZlcnNpb24gMS4xLgpUaGlzIGxpY2Vuc2UgaXMgY29waWVkIGJlbG93LCBhbmQgaXMgYWxzbyBhdmFpbGFibGUgd2l0aCBhIEZBUSBhdDoKaHR0cDovL3NjcmlwdHMuc2lsLm9yZy9PRkwKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpTSUwgT1BFTiBGT05UIExJQ0VOU0UgVmVyc2lvbiAxLjEgLSAyNiBGZWJydWFyeSAyMDA3Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpQUkVBTUJMRQpUaGUgZ29hbHMgb2YgdGhlIE9wZW4gRm9udCBMaWNlbnNlIChPRkwpIGFyZSB0byBzdGltdWxhdGUgd29ybGR3aWRlCmRldmVsb3BtZW50IG9mIGNvbGxhYm9yYXRpdmUgZm9udCBwcm9qZWN0cywgdG8gc3VwcG9ydCB0aGUgZm9udCBjcmVhdGlvbgplZmZvcnRzIG9mIGFjYWRlbWljIGFuZCBsaW5ndWlzdGljIGNvbW11bml0aWVzLCBhbmQgdG8gcHJvdmlkZSBhIGZyZWUgYW5kCm9wZW4gZnJhbWV3b3JrIGluIHdoaWNoIGZvbnRzIG1heSBiZSBzaGFyZWQgYW5kIGltcHJvdmVkIGluIHBhcnRuZXJzaGlwCndpdGggb3RoZXJzLgoKVGhlIE9GTCBhbGxvd3MgdGhlIGxpY2Vuc2VkIGZvbnRzIHRvIGJlIHVzZWQsIHN0dWRpZWQsIG1vZGlmaWVkIGFuZApyZWRpc3RyaWJ1dGVkIGZyZWVseSBhcyBsb25nIGFzIHRoZXkgYXJlIG5vdCBzb2xkIGJ5IHRoZW1zZWx2ZXMuIFRoZQpmb250cywgaW5jbHVkaW5nIGFueSBkZXJpdmF0aXZlIHdvcmtzLCBjYW4gYmUgYnVuZGxlZCwgZW1iZWRkZWQsIApyZWRpc3RyaWJ1dGVkIGFuZC9vciBzb2xkIHdpdGggYW55IHNvZnR3YXJlIHByb3ZpZGVkIHRoYXQgYW55IHJlc2VydmVkCm5hbWVzIGFyZSBub3QgdXNlZCBieSBkZXJpdmF0aXZlIHdvcmtzLiBUaGUgZm9udHMgYW5kIGRlcml2YXRpdmVzLApob3dldmVyLCBjYW5ub3QgYmUgcmVsZWFzZWQgdW5kZXIgYW55IG90aGVyIHR5cGUgb2YgbGljZW5zZS4gVGhlCnJlcXVpcmVtZW50IGZvciBmb250cyB0byByZW1haW4gdW5kZXIgdGhpcyBsaWNlbnNlIGRvZXMgbm90IGFwcGx5CnRvIGFueSBkb2N1bWVudCBjcmVhdGVkIHVzaW5nIHRoZSBmb250cyBvciB0aGVpciBkZXJpdmF0aXZlcy4KCkRFRklOSVRJT05TCiJGb250IFNvZnR3YXJlIiByZWZlcnMgdG8gdGhlIHNldCBvZiBmaWxlcyByZWxlYXNlZCBieSB0aGUgQ29weXJpZ2h0CkhvbGRlcihzKSB1bmRlciB0aGlzIGxpY2Vuc2UgYW5kIGNsZWFybHkgbWFya2VkIGFzIHN1Y2guIFRoaXMgbWF5CmluY2x1ZGUgc291cmNlIGZpbGVzLCBidWlsZCBzY3JpcHRzIGFuZCBkb2N1bWVudGF0aW9uLgoKIlJlc2VydmVkIEZvbnQgTmFtZSIgcmVmZXJzIHRvIGFueSBuYW1lcyBzcGVjaWZpZWQgYXMgc3VjaCBhZnRlciB0aGUKY29weXJpZ2h0IHN0YXRlbWVudChzKS4KCiJPcmlnaW5hbCBWZXJzaW9uIiByZWZlcnMgdG8gdGhlIGNvbGxlY3Rpb24gb2YgRm9udCBTb2Z0d2FyZSBjb21wb25lbnRzIGFzCmRpc3RyaWJ1dGVkIGJ5IHRoZSBDb3B5cmlnaHQgSG9sZGVyKHMpLgoKIk1vZGlmaWVkIFZlcnNpb24iIHJlZmVycyB0byBhbnkgZGVyaXZhdGl2ZSBtYWRlIGJ5IGFkZGluZyB0bywgZGVsZXRpbmcsCm9yIHN1YnN0aXR1dGluZyAtLSBpbiBwYXJ0IG9yIGluIHdob2xlIC0tIGFueSBvZiB0aGUgY29tcG9uZW50cyBvZiB0aGUKT3JpZ2luYWwgVmVyc2lvbiwgYnkgY2hhbmdpbmcgZm9ybWF0cyBvciBieSBwb3J0aW5nIHRoZSBGb250IFNvZnR3YXJlIHRvIGEKbmV3IGVudmlyb25tZW50LgoKIkF1dGhvciIgcmVmZXJzIHRvIGFueSBkZXNpZ25lciwgZW5naW5lZXIsIHByb2dyYW1tZXIsIHRlY2huaWNhbAp3cml0ZXIgb3Igb3RoZXIgcGVyc29uIHdobyBjb250cmlidXRlZCB0byB0aGUgRm9udCBTb2Z0d2FyZS4KClBFUk1JU1NJT04gJiBDT05ESVRJT05TClBlcm1pc3Npb24gaXMgaGVyZWJ5IGdyYW50ZWQsIGZyZWUgb2YgY2hhcmdlLCB0byBhbnkgcGVyc29uIG9idGFpbmluZwphIGNvcHkgb2YgdGhlIEZvbnQgU29mdHdhcmUsIHRvIHVzZSwgc3R1ZHksIGNvcHksIG1lcmdlLCBlbWJlZCwgbW9kaWZ5LApyZWRpc3RyaWJ1dGUsIGFuZCBzZWxsIG1vZGlmaWVkIGFuZCB1bm1vZGlmaWVkIGNvcGllcyBvZiB0aGUgRm9udApTb2Z0d2FyZSwgc3ViamVjdCB0byB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbnM6CgoxKSBOZWl0aGVyIHRoZSBGb250IFNvZnR3YXJlIG5vciBhbnkgb2YgaXRzIGluZGl2aWR1YWwgY29tcG9uZW50cywKaW4gT3JpZ2luYWwgb3IgTW9kaWZpZWQgVmVyc2lvbnMsIG1heSBiZSBzb2xkIGJ5IGl0c2VsZi4KCjIpIE9yaWdpbmFsIG9yIE1vZGlmaWVkIFZlcnNpb25zIG9mIHRoZSBGb250IFNvZnR3YXJlIG1heSBiZSBidW5kbGVkLApyZWRpc3RyaWJ1dGVkIGFuZC9vciBzb2xkIHdpdGggYW55IHNvZnR3YXJlLCBwcm92aWRlZCB0aGF0IGVhY2ggY29weQpjb250YWlucyB0aGUgYWJvdmUgY29weXJpZ2h0IG5vdGljZSBhbmQgdGhpcyBsaWNlbnNlLiBUaGVzZSBjYW4gYmUKaW5jbHVkZWQgZWl0aGVyIGFzIHN0YW5kLWFsb25lIHRleHQgZmlsZXMsIGh1bWFuLXJlYWRhYmxlIGhlYWRlcnMgb3IKaW4gdGhlIGFwcHJvcHJpYXRlIG1hY2hpbmUtcmVhZGFibGUgbWV0YWRhdGEgZmllbGRzIHdpdGhpbiB0ZXh0IG9yCmJpbmFyeSBmaWxlcyBhcyBsb25nIGFzIHRob3NlIGZpZWxkcyBjYW4gYmUgZWFzaWx5IHZpZXdlZCBieSB0aGUgdXNlci4KCjMpIE5vIE1vZGlmaWVkIFZlcnNpb24gb2YgdGhlIEZvbnQgU29mdHdhcmUgbWF5IHVzZSB0aGUgUmVzZXJ2ZWQgRm9udApOYW1lKHMpIHVubGVzcyBleHBsaWNpdCB3cml0dGVuIHBlcm1pc3Npb24gaXMgZ3JhbnRlZCBieSB0aGUgY29ycmVzcG9uZGluZwpDb3B5cmlnaHQgSG9sZGVyLiBUaGlzIHJlc3RyaWN0aW9uIG9ubHkgYXBwbGllcyB0byB0aGUgcHJpbWFyeSBmb250IG5hbWUgYXMKcHJlc2VudGVkIHRvIHRoZSB1c2Vycy4KCjQpIFRoZSBuYW1lKHMpIG9mIHRoZSBDb3B5cmlnaHQgSG9sZGVyKHMpIG9yIHRoZSBBdXRob3Iocykgb2YgdGhlIEZvbnQKU29mdHdhcmUgc2hhbGwgbm90IGJlIHVzZWQgdG8gcHJvbW90ZSwgZW5kb3JzZSBvciBhZHZlcnRpc2UgYW55Ck1vZGlmaWVkIFZlcnNpb24sIGV4Y2VwdCB0byBhY2tub3dsZWRnZSB0aGUgY29udHJpYnV0aW9uKHMpIG9mIHRoZQpDb3B5cmlnaHQgSG9sZGVyKHMpIGFuZCB0aGUgQXV0aG9yKHMpIG9yIHdpdGggdGhlaXIgZXhwbGljaXQgd3JpdHRlbgpwZXJtaXNzaW9uLgoKNSkgVGhlIEZvbnQgU29mdHdhcmUsIG1vZGlmaWVkIG9yIHVubW9kaWZpZWQsIGluIHBhcnQgb3IgaW4gd2hvbGUsCm11c3QgYmUgZGlzdHJpYnV0ZWQgZW50aXJlbHkgdW5kZXIgdGhpcyBsaWNlbnNlLCBhbmQgbXVzdCBub3QgYmUKZGlzdHJpYnV0ZWQgdW5kZXIgYW55IG90aGVyIGxpY2Vuc2UuIFRoZSByZXF1aXJlbWVudCBmb3IgZm9udHMgdG8KcmVtYWluIHVuZGVyIHRoaXMgbGljZW5zZSBkb2VzIG5vdCBhcHBseSB0byBhbnkgZG9jdW1lbnQgY3JlYXRlZAp1c2luZyB0aGUgRm9udCBTb2Z0d2FyZS4KClRFUk1JTkFUSU9OClRoaXMgbGljZW5zZSBiZWNvbWVzIG51bGwgYW5kIHZvaWQgaWYgYW55IG9mIHRoZSBhYm92ZSBjb25kaXRpb25zIGFyZQpub3QgbWV0LgoKRElTQ0xBSU1FUgpUSEUgRk9OVCBTT0ZUV0FSRSBJUyBQUk9WSURFRCAiQVMgSVMiLCBXSVRIT1VUIFdBUlJBTlRZIE9GIEFOWSBLSU5ELApFWFBSRVNTIE9SIElNUExJRUQsIElOQ0xVRElORyBCVVQgTk9UIExJTUlURUQgVE8gQU5ZIFdBUlJBTlRJRVMgT0YKTUVSQ0hBTlRBQklMSVRZLCBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRSBBTkQgTk9OSU5GUklOR0VNRU5UCk9GIENPUFlSSUdIVCwgUEFURU5ULCBUUkFERU1BUkssIE9SIE9USEVSIFJJR0hULiBJTiBOTyBFVkVOVCBTSEFMTCBUSEUKQ09QWVJJR0hUIEhPTERFUiBCRSBMSUFCTEUgRk9SIEFOWSBDTEFJTSwgREFNQUdFUyBPUiBPVEhFUiBMSUFCSUxJVFksCklOQ0xVRElORyBBTlkgR0VORVJBTCwgU1BFQ0lBTCwgSU5ESVJFQ1QsIElOQ0lERU5UQUwsIE9SIENPTlNFUVVFTlRJQUwKREFNQUdFUywgV0hFVEhFUiBJTiBBTiBBQ1RJT04gT0YgQ09OVFJBQ1QsIFRPUlQgT1IgT1RIRVJXSVNFLCBBUklTSU5HCkZST00sIE9VVCBPRiBUSEUgVVNFIE9SIElOQUJJTElUWSBUTyBVU0UgVEhFIEZPTlQgU09GVFdBUkUgT1IgRlJPTQpPVEhFUiBERUFMSU5HUyBJTiBUSEUgRk9OVCBTT0ZUV0FSRS4AAGgAdAB0AHAAOgAvAC8AcwBjAHIAaQBwAHQAcwAuAHMAaQBsAC4AbwByAGcALwBPAEYATAAAaHR0cDovL3NjcmlwdHMuc2lsLm9yZy9PRkwAAEQAUwBFAEcALgA3ACAAMQAyADoAMwA0AABEU0VHLjcgMTI6MzQAAAAAAgAAAAAAAP+DADIAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAQACAAMABAAQABEAEwAUABUAFgAXABgAGQAaABsAHAAdACQAJQAmACcAKAApACoAKwAsAC0ALgAvADAAMQAyADMANAA1ADYANwA4ADkAOgA7ADwAPQBCAEQARQBGAEcASABJAEoASwBMAE0ATgBPAFAAUQBSAFMAVABVAFYAVwBYAFkAWgBbAFwAXQCDAAAAAAAB//8AAgABAAAAAAAAAAwAFAAEAAAAAgAAAAEAAAABAAAAAAABAAAAANXtRbgAAAAA0CjFngAAAADakuLD",
+      "bpp": 4,
+      "threshold": 128,
+      "height": 48,
+      "ascent": 48,
+      "descent": 0,
+      "glyphs": [],
+      "lvglRanges": "48-57",
+      "lvglSymbols": "0123456789",
+      "lvglAdditionalSources": [],
+      "lvglGlyphs": {
+        "encodings": [
+          {
+            "from": 48,
+            "to": 57
+          }
+        ],
+        "symbols": ""
+      }
+    }
+  ],
   "bitmaps": [],
   "colors": [],
   "themes": [

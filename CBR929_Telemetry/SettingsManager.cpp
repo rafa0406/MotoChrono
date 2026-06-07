@@ -3,7 +3,7 @@
 Preferences SettingsManager::preferences;
 
 // Valeurs par défaut (si la puce est vierge)
-float SettingsManager::tankCapacity = 18.0;
+float SettingsManager::tankCapacity = 10.0;
 float SettingsManager::reserveCapacity = 3.5;
 int SettingsManager::logFrequencyHz = 20;
 float SettingsManager::minSpeedLogging = 5.0;
